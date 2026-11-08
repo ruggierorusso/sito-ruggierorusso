@@ -78,6 +78,10 @@ T = {
    clients='Clients', project='Have a project?', meta='Ruggiero Russo, fashion, still-life and advertising photographer based in Barletta, Italy. Portfolio and ERRE studio.',
    notfound='Page not found', diary='Diary', follow='Follow on Instagram', home='Back to home', close='Close', dir='works', open_photo='Open photo'),
 }
+STUDIO_URL = 'https://errestudiobarletta.it/'
+def SL(h):
+    return h.replace('ERRE studio', f'<a class="sl" href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE studio</a>')
+
 CLIENTS = ['RED Valentino', 'Laura Biagiotti', 'Jean Paul Gaultier', 'Blauer', 'Diadora', 'Umbro', 'Camomilla', 'Pyrex']
 
 def page(lg, depth, title, desc, body, alt_href, og_img, canon):
@@ -106,7 +110,7 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
   <nav aria-label="Menu">
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#lavori">{t['works']}</a>
     {f'<a href="{up}{"" if lg == "it" else "en/"}index.html#diario">{t["diary"]}</a>' if IG else ''}
-    <a href="{up}{'' if lg == 'it' else 'en/'}index.html#studio">{t['studio']}</a>
+    <a href="{STUDIO_URL}" target="_blank" rel="noopener">{t['studio']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#chi-sono">{t['about']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#contatti">{t['contact']}</a>
     <a class="lang" href="{alt_href[0]}" hreflang="{'en' if lg == 'it' else 'it'}">{t['other']}</a>
@@ -117,7 +121,7 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
 </main>
 <footer class="foot">
   <img src="{up}assets/logo-full.png" alt="Ruggiero Russo Photography" width="150" height="300" loading="lazy">
-  <span class="small">© 2026 Ruggiero Russo · ERRE studio · Barletta (BT) · P.IVA 07989340729</span>
+  <span class="small">© 2026 Ruggiero Russo · {SL('ERRE studio')} · Barletta (BT) · P.IVA 07989340729</span>
   <span class="links"><a href="https://www.instagram.com/ruggierorussophotography/">Instagram</a><a href="https://www.facebook.com/ruggiero.russo">Facebook</a></span>
 </footer>
 <div class="lb" hidden aria-modal="true" role="dialog" aria-label="Foto">
@@ -166,7 +170,7 @@ def home(lg):
 {diary}
 <section id="studio" class="studio">
   <img src="{up}img/line-of-light-01.jpg" alt="ERRE studio" loading="lazy" width="800" height="1200">
-  <div><h2>ERRE<br>studio</h2><p>{t['studio_t']}</p><a class="ul" href="#contatti">{t['write']} →</a></div>
+  <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></div>
 </section>
 <section id="chi-sono" class="about">
   <h2>{t['about']}</h2><p>{t['about_t']}</p>
@@ -175,7 +179,7 @@ def home(lg):
 <section id="contatti" class="contact">
   <p class="label">{t['project']}</p>
   <a class="mail" href="mailto:info@ruggierorusso.com">info<span class="at">@</span>ruggierorusso.com</a>
-  <p class="addr">ERRE studio · Barletta (BT), {'Italia' if lg == 'it' else 'Italy'}</p>
+  <p class="addr">{SL('ERRE studio')} · Barletta (BT), {'Italia' if lg == 'it' else 'Italy'}</p>
 </section>'''
     alt = ('en/index.html', 'en/') if lg == 'it' else ('../index.html', '')
     canon = '' if lg == 'it' else 'en/'
@@ -184,7 +188,7 @@ def home(lg):
 def project(lg, i):
     t = T[lg]; x = P[i]; d = t['dir']; depth = 1 if lg == 'it' else 2; up = '../' * depth
     prv, nxt = P[i - 1], P[(i + 1) % len(P)]
-    cr = ''.join(f'<div><dt>{E(k) if k else "&nbsp;"}</dt><dd>{E(v)}</dd></div>' for k, v in x['cr'])
+    cr = ''.join(f'<div><dt>{E(k) if k else "&nbsp;"}</dt><dd>{SL(E(v))}</dd></div>' for k, v in x['cr'])
     gal = ''.join(f'<a href="{up}img/{f}" data-i="{k}"><img src="{up}img/{f}" alt="{E(x["t"])} – {k + 1}" width="{w}" height="{h}" loading="{"eager" if k < 2 else "lazy"}"></a>'
                   for k, (f, (w, h)) in enumerate(x['files']))
     body = f'''<section class="phead">

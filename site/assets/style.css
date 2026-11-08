@@ -124,3 +124,4 @@ h1,h2{font-weight:400;margin:0;text-transform:uppercase}
 }
 @media (hover:none){.preview{display:none}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+.sl{color:inherit;border-bottom:1px solid var(--red);transition:color .15s}.sl:hover{color:var(--red)}
