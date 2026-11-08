@@ -69,14 +69,14 @@ T = {
    similar='Un progetto simile?', write='Scrivimi', photos='foto', studio_t='Lo studio di Barletta, rinnovato di recente, dove nascono campagne, editoriali e still-life. Set luce professionali e postazione di post-produzione.',
    about_t="Fotografo professionista da oltre vent'anni. Lavoro per brand, agenzie e magazine nella moda, nello still-life e nella pubblicità, in studio e in location, integrando gli strumenti di intelligenza artificiale nel mio flusso di lavoro.",
    clients='Hanno scelto il mio lavoro', project='Hai un progetto?', meta='Ruggiero Russo, fotografo fashion, still-life e advertising a Barletta. Portfolio e ERRE studio.',
-   notfound='Pagina non trovata', diary='Diario', follow='Segui su Instagram', home='Torna alla home', close='Chiudi', dir='lavori', open_photo='Apri la foto'),
+   notfound='Pagina non trovata', diary='Diario', diary_all='Tutto il diario', diary_p='diario.html', diary_t='Il diario di lavoro: tutti i post pubblicati su Instagram, aggiornati in automatico.', follow='Segui su Instagram', home='Torna alla home', close='Chiudi', dir='lavori', open_photo='Apri la foto'),
  'en': dict(lang='en', works='Works', studio='ERRE studio', about='About', contact='Contact', other='IT',
    tag='Photographer · Fashion · Still-life · Advertising', avail='Available for new projects',
    index='Index of works', all='All', back='Index of works', prev='Previous project', next='Next project',
    similar='A similar project?', write='Get in touch', photos='photos', studio_t='My recently renovated studio in Barletta, Italy, where campaigns, editorials and still-life are made. Professional lighting sets and a post-production suite.',
    about_t='Professional photographer for over twenty years. I work for brands, agencies and magazines in fashion, still-life and advertising, in the studio and on location, with AI tools built into my workflow.',
    clients='Clients', project='Have a project?', meta='Ruggiero Russo, fashion, still-life and advertising photographer based in Barletta, Italy. Portfolio and ERRE studio.',
-   notfound='Page not found', diary='Diary', follow='Follow on Instagram', home='Back to home', close='Close', dir='works', open_photo='Open photo'),
+   notfound='Page not found', diary='Diary', diary_all='Full diary', diary_p='diary.html', diary_t='A working diary: every post published on Instagram, updated automatically.', follow='Follow on Instagram', home='Back to home', close='Close', dir='works', open_photo='Open photo'),
 }
 STUDIO_URL = 'https://errestudiobarletta.it/'
 def SL(h):
@@ -109,7 +109,7 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
   <a class="brand" href="{up}{'' if lg == 'it' else 'en/'}index.html"><img src="{up}assets/logo-r.png" alt="" width="37" height="44"><span>Ruggiero Russo</span></a>
   <nav aria-label="Menu">
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#lavori">{t['works']}</a>
-    {f'<a href="{up}{"" if lg == "it" else "en/"}index.html#diario">{t["diary"]}</a>' if IG else ''}
+    {f'<a href="{up}{"" if lg == "it" else "en/"}{t["diary_p"]}">{t["diary"]}</a>' if IG else ''}
     <a href="{STUDIO_URL}" target="_blank" rel="noopener">{t['studio']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#chi-sono">{t['about']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#contatti">{t['contact']}</a>
@@ -151,7 +151,7 @@ def home(lg):
     diary = ''
     if IG:
         cells = ''.join(f'<a href="{E(x["permalink"])}" target="_blank" rel="noopener"><img src="{up}img/{x["files"][0]}" alt="{E((x.get("caption") or "Instagram").splitlines()[0][:90])}" loading="lazy" width="600" height="600"></a>' for x in IG[:12])
-        diary = f'<section id="diario" class="diary"><div class="bar"><h2>{t["diary"]}</h2><a class="ul" href="https://www.instagram.com/ruggierorussophotography/" target="_blank" rel="noopener">{t["follow"]} →</a></div><div class="dgrid">{cells}</div></section>'
+        diary = f'<section id="diario" class="diary"><div class="bar"><h2>{t["diary"]}</h2><a class="ul" href="{t["diary_p"]}">{t["diary_all"]} ({len(IG)}) →</a></div><div class="dgrid">{cells}</div></section>'
     body = f'''<section class="intro">
   <img class="mark" src="{up}assets/logo-r.png" alt="" width="250" height="300">
   <div>
@@ -210,16 +210,31 @@ def project(lg, i):
     desc = f'{x["t"]} – ' + ', '.join(v for k, v in x['cr'][:3]) + ' · Ruggiero Russo Photography'
     return page(lg, depth, f'{x["t"]} · Ruggiero Russo', desc, body, alt, x['cover'], canon)
 
+def diary(lg):
+    t = T[lg]; up = '' if lg == 'it' else '../'
+    cells = ''.join(f'<a href="{E(x["permalink"])}" target="_blank" rel="noopener"><img src="{up}img/{x["files"][0]}" alt="{E((x.get("caption") or "Instagram").splitlines()[0][:90])}" loading="lazy" width="600" height="600"></a>' for x in IG)
+    body = f'''<section class="phead">
+  <a class="back" href="index.html">← {t['home']}</a>
+  <div class="ptitle"><h1>{t['diary']}</h1><span class="red">{len(IG)} post · Instagram</span></div>
+</section>
+<section id="diario" class="diary"><div class="bar"><p class="addr">{t['diary_t']}</p><a class="ul" href="https://www.instagram.com/ruggierorussophotography/" target="_blank" rel="noopener">{t["follow"]} →</a></div><div class="dgrid">{cells}</div></section>'''
+    o = T['en' if lg == 'it' else 'it']['diary_p']
+    alt = (f'en/{o}', f'en/{o}') if lg == 'it' else (f'../{o}', o)
+    canon = t['diary_p'] if lg == 'it' else f'en/{t["diary_p"]}'
+    return page(lg, 0 if lg == 'it' else 1, f'{t["diary"]} · Ruggiero Russo', t['diary_t'], body, alt, IG[0]['files'][0], canon)
+
 def w(rel, s):
     p = os.path.join(SITE, rel); os.makedirs(os.path.dirname(p), exist_ok=True)
     open(p, 'w', encoding='utf-8').write(s)
 
 w('index.html', home('it')); w('en/index.html', home('en'))
+if IG:
+    w(T['it']['diary_p'], diary('it')); w('en/' + T['en']['diary_p'], diary('en'))
 for i in range(len(P)):
     w(f'lavori/{P[i]["s"]}.html', project('it', i)); w(f'en/works/{P[i]["s"]}.html', project('en', i))
 nf = f'<section class="nf"><h1>404</h1><p>{T["it"]["notfound"]} · {T["en"]["notfound"]}</p><a class="ul" href="/index.html">{T["it"]["home"]}</a></section>'
 w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/'))
-urls = [''] + ['en/'] + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
+urls = [''] + ['en/'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
 w('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{DOMAIN}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
 w('robots.txt', f'User-agent: *\nAllow: /\nSitemap: {DOMAIN}/sitemap.xml\n')
 w('_redirects', '/portfolio-item/:slug/  /lavori/:slug.html  301\n/portfolio/  /#lavori  301\n')

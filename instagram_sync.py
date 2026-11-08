@@ -1,4 +1,4 @@
-"""Downloads the latest Instagram posts into site/img/ig and writes instagram.json.
+"""Downloads all Instagram posts into site/img/ig and writes instagram.json.
 
 Needs the environment variable IG_TOKEN (Instagram API with Instagram Login, long-lived token).
 Run by .github/workflows/instagram.yml once a day; build.py then turns the posts into the
@@ -12,7 +12,7 @@ OUT = os.path.join(ROOT, 'site', 'img', 'ig')
 DB = os.path.join(ROOT, 'instagram.json')
 API = 'https://graph.instagram.com'
 FIELDS = 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,children{media_type,media_url,thumbnail_url}'
-MAX_POSTS = 60
+MAX_POSTS = 2000  # in pratica: tutti i post
 
 token = os.environ.get('IG_TOKEN', '').strip()
 if not token:
@@ -26,13 +26,13 @@ def api(path, **params):
     params['access_token'] = token
     return json.loads(get(f'{API}/{path}?{urllib.parse.urlencode(params)}'))
 
-def save(url, dest):
+def save(url, dest, size):
     if os.path.exists(dest): return True
     try:
         im = Image.open(io.BytesIO(get(url))).convert('RGB')
     except Exception as e:
         print('  salto immagine:', e); return False
-    im.thumbnail((1600, 1600), Image.LANCZOS)
+    im.thumbnail((size, size), Image.LANCZOS)
     im.save(dest, 'JPEG', quality=80, optimize=True, progressive=True)
     return True
 
@@ -49,14 +49,22 @@ posts = posts[:MAX_POSTS]
 out = []
 for p in posts:
     items = p.get('children', {}).get('data') or [p]
+    # per il Diario basta la copertina; i post #portfolio diventano pagine progetto e servono tutte le foto
+    portfolio = '#portfolio' in (p.get('caption') or '').lower()
+    if not portfolio: items = items[:1]
     files = []
     for k, it in enumerate(items, 1):
         src = it.get('thumbnail_url') if it.get('media_type') == 'VIDEO' else it.get('media_url')
         if not src: continue
         name = f"{p['id']}-{k:02d}.jpg"
-        if save(src, os.path.join(OUT, name)): files.append('ig/' + name)
+        if save(src, os.path.join(OUT, name), 1600 if portfolio else 1080): files.append('ig/' + name)
     out.append(dict(id=p['id'], caption=p.get('caption', ''), permalink=p.get('permalink', ''),
                     ts=p.get('timestamp', ''), type=p.get('media_type', ''), files=files))
+
+# rimuove le immagini di post cancellati da Instagram
+keep = {f[3:] for x in out for f in x['files']}
+for f in os.listdir(OUT):
+    if f not in keep: os.remove(os.path.join(OUT, f))
 
 json.dump({'posts': out}, open(DB, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print('post Instagram:', len(out))
