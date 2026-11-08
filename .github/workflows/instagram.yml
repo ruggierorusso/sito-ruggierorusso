@@ -30,6 +30,7 @@ jobs:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
+          case "$IG_TOKEN" in IG*) ;; *) echo "Token Facebook/Unified Login: non scade, nessun rinnovo"; exit 0;; esac
           NEW=$(curl -s "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${IG_TOKEN}" | python -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
           if [ -n "$NEW" ] && [ -n "$GH_PAT" ]; then
             echo "$NEW" | GH_TOKEN="$GH_PAT" gh secret set IG_TOKEN --repo "$GITHUB_REPOSITORY"

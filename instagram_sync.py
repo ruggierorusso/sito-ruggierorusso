@@ -1,6 +1,7 @@
 """Downloads all Instagram posts into site/img/ig and writes instagram.json.
 
-Needs the environment variable IG_TOKEN (Instagram API with Instagram Login, long-lived token).
+Needs the environment variable IG_TOKEN: either an Instagram Login token (graph.instagram.com)
+or a Facebook/Unified Login system-user token (graph.facebook.com, never expires).
 Run by .github/workflows/instagram.yml once a day; build.py then turns the posts into the
 "Diario" grid and, for captions containing #portfolio, into full project pages.
 """
@@ -22,9 +23,20 @@ def get(url):
     with urllib.request.urlopen(url, timeout=60) as r:
         return r.read()
 
+IG_USER_ID = os.environ.get('IG_USER_ID', '17841400928920314').strip()
+FB_API = 'https://graph.facebook.com/v21.0'
+
 def api(path, **params):
     params['access_token'] = token
     return json.loads(get(f'{API}/{path}?{urllib.parse.urlencode(params)}'))
+
+def first_page():
+    # token Instagram Login (inizia con IG...) oppure token Facebook / Unified Login
+    global API
+    if token.startswith('IG'):
+        return api('me/media', fields=FIELDS, limit=50)
+    API = FB_API
+    return api(f'{IG_USER_ID}/media', fields=FIELDS, limit=50)
 
 def save(url, dest, size):
     if os.path.exists(dest): return True
@@ -38,7 +50,7 @@ def save(url, dest, size):
 
 os.makedirs(OUT, exist_ok=True)
 posts, url = [], None
-data = api('me/media', fields=FIELDS, limit=50)
+data = first_page()
 while True:
     posts += data.get('data', [])
     nxt = data.get('paging', {}).get('next')
