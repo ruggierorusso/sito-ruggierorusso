@@ -122,7 +122,7 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
 <footer class="foot">
   <img src="{up}assets/logo-full.png" alt="Ruggiero Russo Photography" width="150" height="300" loading="lazy">
   <span class="small">© 2026 Ruggiero Russo · {SL('ERRE studio')} · Barletta (BT) · P.IVA 07989340729</span>
-  <span class="links"><a href="https://www.instagram.com/ruggierorussophotography/">Instagram</a><a href="https://www.facebook.com/ruggiero.russo">Facebook</a></span>
+  <span class="links"><a href="https://www.instagram.com/ruggierorussophotography/">Instagram</a><a href="https://www.facebook.com/ruggiero.russo">Facebook</a><a href="{up}{'' if lg == 'it' else 'en/'}privacy.html">Privacy</a></span>
 </footer>
 <div class="lb" hidden aria-modal="true" role="dialog" aria-label="Foto">
   <button class="lb-x" type="button" aria-label="{t['close']}">×</button>
@@ -232,9 +232,18 @@ if IG:
     w(T['it']['diary_p'], diary('it')); w('en/' + T['en']['diary_p'], diary('en'))
 for i in range(len(P)):
     w(f'lavori/{P[i]["s"]}.html', project('it', i)); w(f'en/works/{P[i]["s"]}.html', project('en', i))
+import privacy_text as PT
+def privacy(lg):
+    secs = ''.join(f'<h2>{h}</h2><p>{b}</p>' for h, b in PT.SECTIONS[lg])
+    upd = ('Ultimo aggiornamento: ' if lg == 'it' else 'Last updated: ') + PT.UPDATED[lg]
+    body = f'<section class="legal"><h1>{PT.TITLE[lg]}</h1><p class="label">{upd}</p>{secs}</section>'
+    alt = ('en/privacy.html', 'en/privacy.html') if lg == 'it' else ('../privacy.html', 'privacy.html')
+    canon = 'privacy.html' if lg == 'it' else 'en/privacy.html'
+    return page(lg, 0 if lg == 'it' else 1, PT.TITLE[lg] + ' · Ruggiero Russo', PT.TITLE[lg] + ' – ruggierorusso.com', body, alt, P[0]['cover'], canon)
+w('privacy.html', privacy('it')); w('en/privacy.html', privacy('en'))
 nf = f'<section class="nf"><h1>404</h1><p>{T["it"]["notfound"]} · {T["en"]["notfound"]}</p><a class="ul" href="/index.html">{T["it"]["home"]}</a></section>'
-w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/'))
-urls = [''] + ['en/'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
+w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/').replace('href="privacy.html"', 'href="/privacy.html"'))
+urls = [''] + ['en/', 'privacy.html', 'en/privacy.html'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
 w('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{DOMAIN}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
 w('robots.txt', f'User-agent: *\nAllow: /\nSitemap: {DOMAIN}/sitemap.xml\n')
 w('_redirects', '/portfolio-item/:slug/  /lavori/:slug.html  301\n/portfolio/  /#lavori  301\n')

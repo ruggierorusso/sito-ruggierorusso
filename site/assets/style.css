@@ -105,7 +105,16 @@ h1,h2{font-weight:400;margin:0;text-transform:uppercase}
 .dgrid img{width:100%;aspect-ratio:1/1;object-fit:cover;filter:grayscale(.15);transition:filter .2s}
 .dgrid a:hover img{filter:none}
 
+.legal{max-width:760px;padding:56px 24px 24px}
+.legal h1{font-size:clamp(1.8rem,4vw,3rem);letter-spacing:.18em;margin-bottom:14px}
+.legal h2{font-size:14px;letter-spacing:.3em;margin:40px 0 12px}
+.legal p{font-family:var(--text);font-size:16px;line-height:1.7;color:var(--soft);margin:0}
+.legal p a{border-bottom:1px solid var(--red)}
+.legal strong{color:var(--fg);font-weight:600}
+.legal .label{margin:0}
+
 @media (max-width:760px){
+  .legal{padding:36px 16px 16px}
   .diary{padding:0 16px 64px}.dgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
   .top{padding:14px 16px}.brand{font-size:11px;letter-spacing:.35em}.brand img{height:34px}
   .top nav{gap:4px 18px;font-size:11px;letter-spacing:.22em;width:100%}
