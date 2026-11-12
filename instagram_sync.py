@@ -5,7 +5,7 @@ or a Facebook/Unified Login system-user token (graph.facebook.com, never expires
 Run by .github/workflows/instagram.yml once a day; build.py then turns the posts into the
 "Diario" grid and, for captions containing #portfolio, into full project pages.
 """
-import json, os, sys, io, urllib.request, urllib.parse
+import json, os, sys, io, urllib.request, urllib.parse, urllib.error
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -20,8 +20,17 @@ if not token:
     sys.exit('IG_TOKEN mancante: aggiungilo nei Secrets del repository.')
 
 def get(url):
-    with urllib.request.urlopen(url, timeout=60) as r:
-        return r.read()
+    try:
+        with urllib.request.urlopen(url, timeout=60) as r:
+            return r.read()
+    except urllib.error.HTTPError as e:
+        body = e.read().decode('utf-8', 'replace')
+        try:
+            err = json.loads(body).get('error', {})
+            msg = f"{err.get('type', '')} (codice {err.get('code', '?')}/{err.get('error_subcode', '-')}): {err.get('message', '')}"
+        except Exception:
+            msg = body[:300]
+        sys.exit(f'Instagram ha rifiutato la richiesta (HTTP {e.code}): {msg}')
 
 IG_USER_ID = os.environ.get('IG_USER_ID', '17841400928920314').strip()
 FB_API = 'https://graph.facebook.com/v21.0'
