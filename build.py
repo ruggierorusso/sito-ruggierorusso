@@ -3,10 +3,11 @@ import json, os, re, html, sys
 from PIL import Image
 import forms_pages as FP
 import extras as XP
+import seo as SEO
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(ROOT, 'site')
-DOMAIN = 'https://www.ruggierorusso.com'
+DOMAIN = 'https://ruggierorusso.com'
 cat = json.load(open(os.path.join(ROOT, 'catalogo.json'), encoding='utf-8'))
 E = html.escape
 
@@ -201,12 +202,12 @@ def home(lg):
 <section id="contatti" class="contact">
   <p class="label">{t['project']}</p>
   <a class="mail" href="mailto:info@ruggierorusso.com">info<span class="at">@</span>ruggierorusso.com</a>
-  <p class="addr">{SL('ERRE studio')} · Barletta (BT), {'Italia' if lg == 'it' else 'Italy'}</p>
+  <p class="addr">{SL('ERRE studio')} · Via Patalini 11, 76121 Barletta (BT), {'Italia' if lg == 'it' else 'Italy'} · <a href="tel:+393898012408">+39 389 801 2408</a></p>
   <p class="ctas"><a class="btn red" href="{up}{FP.PATHS['quote'][lg]}">{FP.TX[lg]['cta_quote']} →</a><a class="btn" href="{up}{FP.PATHS['book'][lg]}">{FP.TX[lg]['cta_book']}</a></p>
 </section>'''
     alt = ('en/index.html', 'en/') if lg == 'it' else ('../index.html', '')
     canon = '' if lg == 'it' else 'en/'
-    return page(lg, 0 if lg == 'it' else 1, 'Ruggiero Russo · Photography', t['meta'], body, alt, first['cover'], canon)
+    return page(lg, 0 if lg == 'it' else 1, 'Ruggiero Russo · Photography', t['meta'], body, alt, first['cover'], canon).replace('</head>', SEO.home(DOMAIN, lg, first['cover']) + '\n</head>', 1)
 
 def project(lg, i):
     t = T[lg]; x = P[i]; d = t['dir']; depth = 1 if lg == 'it' else 2; up = '../' * depth
@@ -232,7 +233,10 @@ def project(lg, i):
            else (f'../../{other}/{x["s"]}.html', f'{other}/{x["s"]}.html'))
     canon = f'{d}/{x["s"]}.html' if lg == 'it' else f'en/{d}/{x["s"]}.html'
     desc = f'{x["t"]} – ' + ', '.join(v for k, v in x['cr'][:3]) + ' · Ruggiero Russo Photography'
-    return page(lg, depth, f'{x["t"]} · Ruggiero Russo', desc, body, alt, x['cover'], canon)
+    brand = next((v.split(' for ')[0] for k, v in x['cr'] if k.upper().strip() == 'BRAND'), None)
+    ld = SEO.project(DOMAIN, lg, f'{DOMAIN}/{canon}', x['t'], desc, [f'{DOMAIN}/img/{f}' for f, _ in x['files']],
+                     DOMAIN + ('/' if lg == 'it' else '/en/'), t['works'], brand)
+    return page(lg, depth, f'{x["t"]} · Ruggiero Russo', desc, body, alt, x['cover'], canon).replace('</head>', ld + '\n</head>', 1)
 
 def diary(lg):
     t = T[lg]; up = '' if lg == 'it' else '../'

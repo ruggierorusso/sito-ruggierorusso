@@ -225,7 +225,7 @@
   if (att && hid) {
     var l = load();
     if (l.length) {
-      hid.value = l.map(function (x) { return 'https://www.ruggierorusso.com/' + x.s; }).join('\n');
+      hid.value = l.map(function (x) { return 'https://ruggierorusso.com/' + x.s; }).join('\n');
       var r = att.getAttribute('data-root');
       att.innerHTML = '<p class="label">' + l.length + ' ' + att.getAttribute('data-label') + '</p><div>' +
         l.slice(0, 12).map(function (x) { return '<img src="' + r + x.s + '" alt="">'; }).join('') + '</div>';
