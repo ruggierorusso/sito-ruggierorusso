@@ -104,7 +104,7 @@ def quote_body(lg, up):
             f'<label class="fld"><span>{t["q_notes"]}</span><textarea name="note" rows="4" placeholder="{E(t["notes_ph"])}"></textarea></label>'),
         (t['q_you'], _contact(t, priv)),
     ]
-    action = '/' + PATHS['thanks'][lg]
+    action = '/' + PATHS['thanks'][lg] + '?f=preventivo'
     return f'''<section class="phead">
   <div class="ptitle"><h1>{t['quote_t']}</h1><span class="red">{t['quote']}</span></div>
   <p class="lead">{t['quote_d']}</p>
@@ -127,7 +127,7 @@ def book_body(lg, up, studio_img):
             f'<label class="fld"><span>{t["q_notes"]}</span><textarea name="note" rows="3"></textarea></label>'),
         (t['q_you'], _contact(t, priv)),
     ]
-    action = '/' + PATHS['thanks'][lg]
+    action = '/' + PATHS['thanks'][lg] + '?f=studio'
     return f'''<section class="phead">
   <div class="ptitle"><h1>{t['book_t']}</h1><span class="red">Barletta (BT)</span></div>
   <p class="lead">{t['book_d']}</p>
