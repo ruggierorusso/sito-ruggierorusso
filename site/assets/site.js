@@ -130,3 +130,148 @@
     show(0); refresh();
   });
 })();
+
+// ---- Moodboard: foto preferite salvate solo in questo browser ----
+(function () {
+  var KEY = 'rr-moodboard';
+  function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
+  function save(l) { try { localStorage.setItem(KEY, JSON.stringify(l)); } catch (e) {} paint(); }
+  function has(src) { return load().some(function (x) { return x.s === src; }); }
+  function toggle(item) {
+    var l = load(), i = -1;
+    l.forEach(function (x, k) { if (x.s === item.s) i = k; });
+    if (i >= 0) l.splice(i, 1); else l.push(item);
+    save(l);
+  }
+  var gal = document.querySelector('.gallery');
+  var lbImg = document.querySelector('.lb img'), lbFav = document.querySelector('.lb-f');
+  function lbSrc() { if (!lbImg || !lbImg.getAttribute('src')) return null; var m = lbImg.getAttribute('src').match(/img\/[^?#]+$/); return m ? m[0] : null; }
+  function paint() {
+    var n = load().length;
+    Array.prototype.forEach.call(document.querySelectorAll('.mb-link'), function (a) { a.hidden = n === 0; a.querySelector('[data-mb-n]').textContent = n; });
+    if (gal) Array.prototype.forEach.call(gal.querySelectorAll('.fav'), function (b) {
+      var on = has(b.getAttribute('data-src'));
+      b.setAttribute('aria-pressed', on); b.textContent = on ? '♥' : '♡';
+      b.title = gal.getAttribute(on ? 'data-saved' : 'data-save');
+    });
+    if (lbFav) { var s = lbSrc(), on2 = s && has(s); lbFav.hidden = !gal; lbFav.setAttribute('aria-pressed', !!on2); lbFav.textContent = on2 ? '♥' : '♡'; }
+  }
+  if (gal) gal.addEventListener('click', function (e) {
+    var b = e.target.closest('.fav'); if (!b) return;
+    e.preventDefault();
+    toggle({ s: b.getAttribute('data-src'), p: b.getAttribute('data-p'), t: b.getAttribute('data-t') });
+    b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+  });
+  if (lbFav && gal) {
+    lbImg.addEventListener('load', paint);
+    lbFav.addEventListener('click', function () {
+      var s = lbSrc(); if (!s) return;
+      var b = gal.querySelector('.fav[data-src="' + s + '"]');
+      if (b) toggle({ s: s, p: b.getAttribute('data-p'), t: b.getAttribute('data-t') });
+    });
+  }
+  window.addEventListener('storage', paint);
+
+  // Pagina moodboard
+  var pg = document.querySelector('[data-mb-page]');
+  if (pg) {
+    var root = pg.getAttribute('data-root'), grid = pg.querySelector('.mbgrid');
+    var q = new URLSearchParams(location.search).get('p');
+    var shared = q ? q.split(',').filter(function (f) { return /^[a-z0-9-]+$/.test(f); }).map(function (f) {
+      return { s: 'img/' + f + '.jpg', p: (document.documentElement.lang === 'en' ? 'works/' : 'lavori/') + f.replace(/-\d+$/, '') + '.html', t: '' };
+    }) : null;
+    var render = function () {
+      var l = shared || load();
+      grid.innerHTML = '';
+      l.forEach(function (x) {
+        var d = document.createElement('figure');
+        var a = document.createElement('a'), slug = (x.p.match(/([^\/]+)\.html$/) || [, ''])[1];
+        a.href = (document.documentElement.lang === 'en' ? 'works/' : 'lavori/') + slug + '.html';
+        var im = document.createElement('img'); im.src = root + x.s; im.alt = x.t || ''; im.loading = 'lazy';
+        a.appendChild(im); d.appendChild(a);
+        if (!shared) {
+          var r = document.createElement('button'); r.type = 'button'; r.className = 'rm'; r.textContent = '×';
+          r.setAttribute('aria-label', pg.getAttribute('data-remove'));
+          r.addEventListener('click', function () { save(load().filter(function (y) { return y.s !== x.s; })); render(); });
+          d.appendChild(r);
+        }
+        grid.appendChild(d);
+      });
+      pg.querySelector('.mb-empty').hidden = l.length > 0;
+      pg.querySelector('.mb-actions').hidden = l.length === 0;
+      pg.querySelector('[data-mb-keep]').hidden = !shared;
+      pg.querySelector('[data-mb-clear]').hidden = !!shared;
+      var c = document.querySelector('[data-mb-count]'); if (c) c.textContent = l.length + (document.documentElement.lang === 'en' ? ' photos' : ' foto');
+      var sh = pg.querySelector('.mb-shared'); sh.hidden = !shared; sh.textContent = pg.getAttribute('data-shared');
+    };
+    pg.querySelector('[data-mb-share]').addEventListener('click', function (e) {
+      var l = shared || load(), btn = e.currentTarget;
+      var url = location.origin + location.pathname + '?p=' + l.map(function (x) { return x.s.replace(/^img\//, '').replace(/\.jpg$/, ''); }).join(',');
+      var done = function () { var o = btn.textContent; btn.textContent = pg.getAttribute('data-copied') + ' ✓'; setTimeout(function () { btn.textContent = o; }, 2000); };
+      if (navigator.share && matchMedia('(hover: none)').matches) navigator.share({ url: url }).catch(function () {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { prompt('', url); });
+      else prompt('', url);
+    });
+    pg.querySelector('[data-mb-keep]').addEventListener('click', function () {
+      var l = load(); shared.forEach(function (x) { if (!l.some(function (y) { return y.s === x.s; })) l.push(x); });
+      save(l); shared = null; history.replaceState(null, '', location.pathname); render();
+    });
+    pg.querySelector('[data-mb-clear]').addEventListener('click', function () { save([]); render(); });
+    render();
+  }
+
+  // Modulo preventivo: allega la moodboard
+  var att = document.querySelector('.mb-att'), hid = document.querySelector('input[name="moodboard"]');
+  if (att && hid) {
+    var l = load();
+    if (l.length) {
+      hid.value = l.map(function (x) { return 'https://www.ruggierorusso.com/' + x.s; }).join('\n');
+      var r = att.getAttribute('data-root');
+      att.innerHTML = '<p class="label">' + l.length + ' ' + att.getAttribute('data-label') + '</p><div>' +
+        l.slice(0, 12).map(function (x) { return '<img src="' + r + x.s + '" alt="">'; }).join('') + '</div>';
+      att.hidden = false;
+    }
+  }
+  paint();
+})();
+
+// ---- 404: disegna con la luce ----
+(function () {
+  var s = document.querySelector('[data-lp]'); if (!s) return;
+  var c = s.querySelector('canvas'), g = c.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var pts = [], last = null, auto = true, t0 = performance.now();
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function size() { var r = s.getBoundingClientRect(); c.width = r.width * dpr; c.height = r.height * dpr; c.style.width = r.width + 'px'; c.style.height = r.height + 'px'; g.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  size(); addEventListener('resize', size);
+  function add(x, y) {
+    if (last) { var dx = x - last.x, dy = y - last.y, n = Math.max(1, Math.floor(Math.hypot(dx, dy) / 3));
+      for (var i = 1; i <= n; i++) pts.push({ x: last.x + dx * i / n, y: last.y + dy * i / n, a: 1 }); }
+    last = { x: x, y: y };
+  }
+  function pos(e) { var r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  s.addEventListener('pointermove', function (e) { if (e.target.closest('a,button')) return; if (auto) { auto = false; last = null; } var p = pos(e); add(p[0], p[1]); });
+  s.addEventListener('pointerdown', function (e) { if (e.target.closest('a,button')) return; auto = false; last = null; var p = pos(e); add(p[0], p[1]); });
+  s.addEventListener('pointerup', function () { last = null; });
+  s.addEventListener('pointerleave', function () { last = null; });
+  s.querySelector('[data-lp-clear]').addEventListener('click', function () { pts = []; last = null; });
+  function frame(t) {
+    if (auto && !reduce) {
+      var w = c.width / dpr, h = c.height / dpr, k = (t - t0) / 1000;
+      add(w * (0.5 + 0.36 * Math.sin(k * 0.9)), h * (0.5 + 0.3 * Math.sin(k * 1.7 + 1)));
+    }
+    g.globalCompositeOperation = 'source-over'; g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height);
+    g.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i], r = 14;
+      var gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+      gr.addColorStop(0, 'rgba(255,240,230,' + 0.5 * p.a + ')');
+      gr.addColorStop(0.35, 'rgba(255,42,31,' + 0.35 * p.a + ')');
+      gr.addColorStop(1, 'rgba(255,42,31,0)');
+      g.fillStyle = gr; g.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+      p.a *= 0.996;
+    }
+    pts = pts.filter(function (p) { return p.a > 0.04; }).slice(-2500);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();

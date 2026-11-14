@@ -31,7 +31,7 @@ TX = {
    b_date='Data', b_slot='Fascia', b_slots=['Mattina', 'Pomeriggio', 'Giornata intera', 'Più giorni'],
    b_people='Quante persone sul set?', b_need='Ti serve…', b_needs=['Luci flash', 'Luci continue', 'Fondali', 'Postazione trucco', 'Assistente di set'],
    thanks_t='Grazie!', thanks_d='La tua richiesta è arrivata. Ti rispondo al più presto, di solito entro un giorno lavorativo.', back_home='Torna al portfolio',
-   cta_quote='Richiedi un preventivo', cta_book='Prenota lo studio'),
+   cta_quote='Richiedi un preventivo', cta_book='Prenota lo studio', mb_att='foto dalla tua moodboard, allegate alla richiesta'),
  'en': dict(
    quote='Quote', quote_t='Request a quote', quote_d='Answer a few questions: in two minutes I get everything I need to prepare a tailored quote.',
    book='Book the studio', book_t='Book ERRE studio', book_d='Request the studio for your own shoot or book a session with me. I will confirm availability and details by email.',
@@ -50,7 +50,7 @@ TX = {
    b_date='Date', b_slot='Slot', b_slots=['Morning', 'Afternoon', 'Full day', 'Several days'],
    b_people='How many people on set?', b_need='You need…', b_needs=['Flash lights', 'Continuous lights', 'Backdrops', 'Make-up station', 'Set assistant'],
    thanks_t='Thank you!', thanks_d='Your request has arrived. I will reply as soon as possible, usually within one working day.', back_home='Back to the portfolio',
-   cta_quote='Request a quote', cta_book='Book the studio'),
+   cta_quote='Request a quote', cta_book='Book the studio', mb_att='photos from your moodboard, attached to the request'),
 }
 
 def rel(lg, key, up):
@@ -72,14 +72,14 @@ def _contact(t, privacy_href):
 </div>
 <label class="consent"><input type="checkbox" name="privacy" value="accettata" required><span>{t['consent'].format(privacy=privacy_href)}</span></label>'''
 
-def _form(name, action, steps, t, extra_attrs=''):
+def _form(name, action, steps, t, extra_attrs='', extra_fields=''):
     n = len(steps)
     fs = ''.join(f'''<fieldset class="step" data-step="{i + 1}">
   <legend><span class="label">{t['step']} {i + 1} {t['of']} {n}</span>{E(title)}</legend>
   {content}
 </fieldset>''' for i, (title, content) in enumerate(steps))
     return f'''<form class="wizard" name="{name}" method="POST" action="{action}" data-netlify="true" netlify-honeypot="bot-field"{extra_attrs}>
-  <input type="hidden" name="form-name" value="{name}">
+  <input type="hidden" name="form-name" value="{name}">{extra_fields}
   <p class="hp"><label>Non compilare: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
   <div class="progress" aria-hidden="true"><span></span></div>
   {fs}
@@ -110,8 +110,9 @@ def quote_body(lg, up):
   <p class="lead">{t['quote_d']}</p>
 </section>
 <section class="formwrap">
-  {_form('preventivo', action, steps, t)}
-  <aside class="summary" aria-live="polite"><p class="label">{t['summary']}</p><dl data-summary data-empty="{t['empty']}"></dl></aside>
+  {_form('preventivo', action, steps, t, '', '<input type="hidden" name="moodboard" value="">')}
+  <aside class="summary" aria-live="polite"><p class="label">{t['summary']}</p><dl data-summary data-empty="{t['empty']}"></dl>
+  <div class="mb-att" hidden data-root="{up}" data-label="{t['mb_att']}"></div></aside>
 </section>'''
 
 def book_body(lg, up, studio_img):

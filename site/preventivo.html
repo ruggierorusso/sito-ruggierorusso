@@ -25,6 +25,7 @@
     <a href="https://errestudiobarletta.it/" target="_blank" rel="noopener">ERRE studio</a>
     <a href="index.html#chi-sono">Chi sono</a>
     <a href="index.html#contatti">Contatti</a>
+    <a class="mb-link" href="moodboard.html" hidden>♡ <span data-mb-n>0</span></a>
     <a class="cta" href="preventivo.html">Preventivo</a>
     <a class="lang" href="en/quote.html" hreflang="en">EN</a>
   </nav>
@@ -36,7 +37,7 @@
 </section>
 <section class="formwrap">
   <form class="wizard" name="preventivo" method="POST" action="/grazie.html" data-netlify="true" netlify-honeypot="bot-field">
-  <input type="hidden" name="form-name" value="preventivo">
+  <input type="hidden" name="form-name" value="preventivo"><input type="hidden" name="moodboard" value="">
   <p class="hp"><label>Non compilare: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
   <div class="progress" aria-hidden="true"><span></span></div>
   <fieldset class="step" data-step="1">
@@ -69,7 +70,8 @@
     <button type="submit" class="btn red" data-send>Invia la richiesta</button>
   </div>
 </form>
-  <aside class="summary" aria-live="polite"><p class="label">Riepilogo</p><dl data-summary data-empty="—"></dl></aside>
+  <aside class="summary" aria-live="polite"><p class="label">Riepilogo</p><dl data-summary data-empty="—"></dl>
+  <div class="mb-att" hidden data-root="" data-label="foto dalla tua moodboard, allegate alla richiesta"></div></aside>
 </section>
 </main>
 <footer class="foot">
@@ -82,6 +84,7 @@
   <button class="lb-p" type="button" aria-label="Progetto precedente">←</button>
   <img alt="">
   <button class="lb-n" type="button" aria-label="Progetto successivo">→</button>
+  <button class="lb-f fav" type="button" aria-pressed="false" aria-label="Aggiungi alla moodboard">♡</button>
   <span class="lb-c"></span>
 </div>
 <script src="assets/site.js" defer></script>

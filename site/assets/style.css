@@ -207,3 +207,37 @@ h1,h2{font-weight:400;margin:0;text-transform:uppercase}
 .clients .logos li:hover img{filter:none;opacity:1}
 .clients .logos .nm span{font-size:12px;letter-spacing:.22em;text-transform:uppercase;text-align:center;line-height:1.4}
 @media (max-width:760px){.clients .logos{grid-template-columns:repeat(2,minmax(0,1fr))}.clients .logos li{height:90px;padding:16px}}
+
+/* ---- Moodboard ---- */
+.top nav .mb-link{color:var(--red)}
+.gallery .gi{position:relative;margin:0 0 12px;break-inside:avoid}
+.gallery .gi a{margin:0}
+.fav{position:absolute;right:10px;bottom:10px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.55);color:#fff;font-size:20px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s,color .15s,border-color .15s}
+.gallery .gi:hover .fav,.fav:focus-visible,.fav[aria-pressed="true"]{opacity:1}
+.fav[aria-pressed="true"]{color:var(--red);border-color:var(--red)}
+.fav:hover{color:var(--red)}
+.fav.pop{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.25)}}
+@media (hover:none){.fav{opacity:1}}
+.lb .lb-f{position:absolute;top:12px;right:76px;left:auto;bottom:auto;width:56px;height:56px;opacity:1;font-size:24px}
+.mbwrap{padding:0 24px 40px}
+.mbgrid{columns:4 220px;column-gap:12px}
+.mbgrid figure{position:relative;margin:0 0 12px;break-inside:avoid}
+.mbgrid img{width:100%}
+.mbgrid .rm{position:absolute;top:8px;right:8px;width:40px;height:40px;border:0;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;font-size:22px;cursor:pointer}
+.mbgrid .rm:hover{color:var(--red)}
+.mb-empty{font-family:var(--text);color:var(--soft);font-size:17px;line-height:1.6}
+.mb-shared{margin:0 0 16px;color:var(--red)}
+.mb-att{margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+.mb-att div{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px}
+.mb-att img{aspect-ratio:1;object-fit:cover;width:100%}
+
+/* ---- 404 light painting ---- */
+.lp{position:relative;min-height:calc(100vh - 90px);display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;cursor:crosshair}
+.lp canvas{position:absolute;inset:0}
+.lp-txt{position:relative;text-align:center;padding:24px;pointer-events:none}
+.lp-txt .ctas{justify-content:center;pointer-events:auto}
+.lp h1{font-size:clamp(6rem,22vw,16rem);letter-spacing:.2em;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(228,228,230,.55)}
+.lp p{font-family:var(--text);color:var(--soft);font-size:16px;line-height:1.6;margin:20px 0 0}
+.lp p span{color:var(--mute);font-size:14px}
+@media (max-width:760px){.mbwrap{padding:0 16px 32px}.mbgrid{columns:2;column-gap:8px}}

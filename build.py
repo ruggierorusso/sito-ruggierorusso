@@ -2,6 +2,7 @@
 import json, os, re, html, sys
 from PIL import Image
 import forms_pages as FP
+import extras as XP
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(ROOT, 'site')
@@ -131,6 +132,7 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
     <a href="{STUDIO_URL}" target="_blank" rel="noopener">{t['studio']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#chi-sono">{t['about']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#contatti">{t['contact']}</a>
+    <a class="mb-link" href="{up}{XP.PATH[lg]}" hidden>♡ <span data-mb-n>0</span></a>
     <a class="cta" href="{up}{FP.PATHS['quote'][lg]}">{FP.TX[lg]['quote']}</a>
     <a class="lang" href="{alt_href[0]}" hreflang="{'en' if lg == 'it' else 'it'}">{t['other']}</a>
   </nav>
@@ -148,6 +150,7 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
   <button class="lb-p" type="button" aria-label="{t['prev']}">←</button>
   <img alt="">
   <button class="lb-n" type="button" aria-label="{t['next']}">→</button>
+  <button class="lb-f fav" type="button" aria-pressed="false" aria-label="{XP.TX[lg]['save']}">♡</button>
   <span class="lb-c"></span>
 </div>
 <script src="{up}assets/site.js" defer></script>
@@ -209,14 +212,15 @@ def project(lg, i):
     t = T[lg]; x = P[i]; d = t['dir']; depth = 1 if lg == 'it' else 2; up = '../' * depth
     prv, nxt = P[i - 1], P[(i + 1) % len(P)]
     cr = ''.join(f'<div><dt>{E(k) if k else "&nbsp;"}</dt><dd>{SL(E(v))}</dd></div>' for k, v in x['cr'])
-    gal = ''.join(f'<a href="{up}img/{f}" data-i="{k}"><img src="{up}img/{f}" alt="{E(x["t"])} – {k + 1}" width="{w}" height="{h}" loading="{"eager" if k < 2 else "lazy"}"></a>'
+    gal = ''.join(f'<div class="gi"><a href="{up}img/{f}" data-i="{k}"><img src="{up}img/{f}" alt="{E(x["t"])} – {k + 1}" width="{w}" height="{h}" loading="{"eager" if k < 2 else "lazy"}"></a>'
+                  f'<button type="button" class="fav" data-src="img/{f}" data-p="{d}/{x["s"]}.html" data-t="{E(x["t"])}" aria-pressed="false" aria-label="{XP.TX[lg]["save"]}" title="{XP.TX[lg]["save"]}">♡</button></div>'
                   for k, (f, (w, h)) in enumerate(x['files']))
     body = f'''<section class="phead">
   <a class="back" href="../{'' if lg == 'it' else ''}index.html#lavori">← {t['back']}</a>
   <div class="ptitle"><h1>{E(x['t'])}</h1><span class="red">{CATS[x['cat']][0]} · {i + 1:02d} / {len(P)}</span></div>
   {f'<dl class="credits">{cr}</dl>' if cr else ''}
 </section>
-<section class="gallery">{gal}</section>
+<section class="gallery" data-save="{XP.TX[lg]['save']}" data-saved="{XP.TX[lg]['saved']}">{gal}</section>
 <p class="note">{len(x['files'])} {t['photos']}</p>
 <nav class="pn" aria-label="{t['works']}">
   <a href="{prv['s']}.html"><span class="label">← {t['prev']}</span><span class="pt">{E(prv['t'])}</span></a>
@@ -266,6 +270,13 @@ for _lg in ('it', 'en'):
     w(FP.PATHS['quote'][_lg], extra_page(_lg, 'quote', FP.quote_body))
     w(FP.PATHS['book'][_lg], extra_page(_lg, 'book', lambda lg, up: FP.book_body(lg, up, 'line-of-light-01.jpg')))
     w(FP.PATHS['thanks'][_lg], extra_page(_lg, 'thanks', FP.thanks_body))
+def moodboard(lg):
+    depth = 0 if lg == 'it' else 1; up = '../' * depth
+    alt = ('en/moodboard.html', 'en/moodboard.html') if lg == 'it' else ('../moodboard.html', 'moodboard.html')
+    body = XP.mb_body(lg, up, up + FP.PATHS['quote'][lg], up + ('' if lg == 'it' else 'en/') + 'index.html#lavori')
+    h = page(lg, depth, XP.TX[lg]['mb_t'] + ' · Ruggiero Russo', XP.TX[lg]['mb_d'], body, alt, P[0]['cover'], XP.PATH[lg])
+    return h.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta name="robots" content="noindex">', 1)
+w(XP.PATH['it'], moodboard('it')); w(XP.PATH['en'], moodboard('en'))
 def privacy(lg):
     secs = ''.join(f'<h2>{h}</h2><p>{b}</p>' for h, b in PT.SECTIONS[lg])
     upd = ('Ultimo aggiornamento: ' if lg == 'it' else 'Last updated: ') + PT.UPDATED[lg]
@@ -274,8 +285,8 @@ def privacy(lg):
     canon = 'privacy.html' if lg == 'it' else 'en/privacy.html'
     return page(lg, 0 if lg == 'it' else 1, PT.TITLE[lg] + ' · Ruggiero Russo', PT.TITLE[lg] + ' – ruggierorusso.com', body, alt, P[0]['cover'], canon)
 w('privacy.html', privacy('it')); w('en/privacy.html', privacy('en'))
-nf = f'<section class="nf"><h1>404</h1><p>{T["it"]["notfound"]} · {T["en"]["notfound"]}</p><a class="ul" href="/index.html">{T["it"]["home"]}</a></section>'
-w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/').replace('href="privacy.html"', 'href="/privacy.html"'))
+nf = XP.nf_body()
+w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/').replace('href="privacy.html"', 'href="/privacy.html"').replace('href="moodboard.html"', 'href="/moodboard.html"').replace('href="preventivo.html"', 'href="/preventivo.html"').replace('href="index.html', 'href="/index.html').replace('href="en/', 'href="/en/'))
 urls = [''] + ['en/', 'privacy.html', 'en/privacy.html', 'preventivo.html', 'en/quote.html', 'prenota-studio.html', 'en/book-studio.html'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
 w('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{DOMAIN}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
 w('robots.txt', f'User-agent: *\nAllow: /\nSitemap: {DOMAIN}/sitemap.xml\n')
