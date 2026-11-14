@@ -84,7 +84,7 @@ def SL(h):
     return h.replace('ERRE studio', f'<a class="sl" href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE studio</a>')
 
 # Brand con cui Ruggiero ha lavorato. Logo: metti il file originale in site/img/clienti/<slug>.svg
-# (oppure .png / .webp, meglio con sfondo trasparente). Senza file, al suo posto compare il nome.
+# (oppure .png / .webp / .jpg, meglio con sfondo trasparente). Senza file, al suo posto compare il nome.
 CLIENTS = [
     ('RED Valentino', 'red-valentino'), ('Laura Biagiotti', 'laura-biagiotti'), ('Jean Paul Gaultier', 'jean-paul-gaultier'),
     ('Blauer', 'blauer'), ('Diadora', 'diadora'), ('Umbro', 'umbro'), ('Pyrex', 'pyrex'), ('Camomilla Italia', 'camomilla-italia'),
@@ -97,7 +97,7 @@ CLIENTS = [
 def client_logos(up):
     out = []
     for name, slug in CLIENTS:
-        f = next((f'clienti/{slug}.{x}' for x in ('svg', 'png', 'webp') if os.path.exists(os.path.join(ROOT, 'site', 'img', 'clienti', f'{slug}.{x}'))), None)
+        f = next((f'clienti/{slug}.{x}' for x in ('svg', 'png', 'webp', 'jpg') if os.path.exists(os.path.join(ROOT, 'site', 'img', 'clienti', f'{slug}.{x}'))), None)
         out.append(f'<li><img src="{up}img/{f}" alt="{E(name)}" loading="lazy"></li>' if f else f'<li class="nm"><span>{E(name)}</span></li>')
     return '<ul class="logos">' + ''.join(out) + '</ul>'
 
