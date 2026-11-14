@@ -1,6 +1,7 @@
 """Static site generator for ruggierorusso.com (IT + EN)."""
 import json, os, re, html, sys
 from PIL import Image
+import forms_pages as FP
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(ROOT, 'site')
@@ -82,7 +83,24 @@ STUDIO_URL = 'https://errestudiobarletta.it/'
 def SL(h):
     return h.replace('ERRE studio', f'<a class="sl" href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE studio</a>')
 
-CLIENTS = ['RED Valentino', 'Laura Biagiotti', 'Jean Paul Gaultier', 'Blauer', 'Diadora', 'Umbro', 'Camomilla', 'Pyrex']
+# Brand con cui Ruggiero ha lavorato. Logo: metti il file originale in site/img/clienti/<slug>.svg
+# (oppure .png / .webp, meglio con sfondo trasparente). Senza file, al suo posto compare il nome.
+CLIENTS = [
+    ('RED Valentino', 'red-valentino'), ('Laura Biagiotti', 'laura-biagiotti'), ('Jean Paul Gaultier', 'jean-paul-gaultier'),
+    ('Blauer', 'blauer'), ('Diadora', 'diadora'), ('Umbro', 'umbro'), ('Pyrex', 'pyrex'), ('Camomilla Italia', 'camomilla-italia'),
+    ('Dimensione Danza', 'dimensione-danza'), ('Perlarouge', 'perlarouge'), ('Disclaimer', 'disclaimer'), ('Hevò', 'hevo'),
+    ('Mejem', 'mejem'), ('Mercii', 'mercii'), ('Cycle', 'cycle'), ('Esmeralda Showroom', 'esmeralda-showroom'),
+    ('4Giveness', '4giveness'), ('PriceTees', 'pricetees'), ('SCISCI', 'scisci'), ('Vitamina Tu', 'vitamina-tu'),
+    ('Shop Art', 'shop-art'), ('DaCaBo', 'dacabo'), ('Dieci Terre', 'dieci-terre'), ('EUMakers', 'eumakers'),
+    ('Olio TA', 'olio-ta'), ('MOYA', 'moya'),
+]
+def client_logos(up):
+    out = []
+    for name, slug in CLIENTS:
+        f = next((f'clienti/{slug}.{x}' for x in ('svg', 'png', 'webp') if os.path.exists(os.path.join(ROOT, 'site', 'img', 'clienti', f'{slug}.{x}'))), None)
+        out.append(f'<li><img src="{up}img/{f}" alt="{E(name)}" loading="lazy"></li>' if f else f'<li class="nm"><span>{E(name)}</span></li>')
+    return '<ul class="logos">' + ''.join(out) + '</ul>'
+
 
 def page(lg, depth, title, desc, body, alt_href, og_img, canon):
     t = T[lg]; up = '../' * depth
@@ -113,6 +131,7 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
     <a href="{STUDIO_URL}" target="_blank" rel="noopener">{t['studio']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#chi-sono">{t['about']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#contatti">{t['contact']}</a>
+    <a class="cta" href="{up}{FP.PATHS['quote'][lg]}">{FP.TX[lg]['quote']}</a>
     <a class="lang" href="{alt_href[0]}" hreflang="{'en' if lg == 'it' else 'it'}">{t['other']}</a>
   </nav>
 </header>
@@ -159,7 +178,7 @@ def home(lg):
     <p class="meta"><span>{t['tag']}</span><span class="red">● {t['avail']}</span></p>
   </div>
 </section>
-<section class="hero">{''.join(hero)}</section>
+<section class="hero torch">{''.join(hero)}</section>
 <section id="lavori" class="works">
   <div class="bar"><h2>{t['index']} <span class="count">({len(P)})</span></h2><div class="chips" role="group">{chips}</div></div>
   <div class="split">
@@ -170,16 +189,17 @@ def home(lg):
 {diary}
 <section id="studio" class="studio">
   <img src="{up}img/line-of-light-01.jpg" alt="ERRE studio" loading="lazy" width="800" height="1200">
-  <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></div>
+  <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><p class="ctas"><a class="btn" href="{up}{FP.PATHS['book'][lg]}">{FP.TX[lg]['cta_book']}</a><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></p></div>
 </section>
 <section id="chi-sono" class="about">
   <h2>{t['about']}</h2><p>{t['about_t']}</p>
 </section>
-<section class="clients"><p class="label">{t['clients']}</p><div>{''.join(f'<span>{E(c)}</span>' for c in CLIENTS)}</div></section>
+<section class="clients"><p class="label">{t['clients']}</p>{client_logos(up)}</section>
 <section id="contatti" class="contact">
   <p class="label">{t['project']}</p>
   <a class="mail" href="mailto:info@ruggierorusso.com">info<span class="at">@</span>ruggierorusso.com</a>
   <p class="addr">{SL('ERRE studio')} · Barletta (BT), {'Italia' if lg == 'it' else 'Italy'}</p>
+  <p class="ctas"><a class="btn red" href="{up}{FP.PATHS['quote'][lg]}">{FP.TX[lg]['cta_quote']} →</a><a class="btn" href="{up}{FP.PATHS['book'][lg]}">{FP.TX[lg]['cta_book']}</a></p>
 </section>'''
     alt = ('en/index.html', 'en/') if lg == 'it' else ('../index.html', '')
     canon = '' if lg == 'it' else 'en/'
@@ -202,7 +222,7 @@ def project(lg, i):
   <a href="{prv['s']}.html"><span class="label">← {t['prev']}</span><span class="pt">{E(prv['t'])}</span></a>
   <a class="r" href="{nxt['s']}.html"><span class="label">{t['next']} →</span><span class="pt">{E(nxt['t'])}</span></a>
 </nav>
-<section class="contact small-c"><p class="label">{t['similar']}</p><a class="mail" href="mailto:info@ruggierorusso.com?subject={E(x['t'])}">info<span class="at">@</span>ruggierorusso.com</a></section>'''
+<section class="contact small-c"><p class="label">{t['similar']}</p><a class="mail" href="mailto:info@ruggierorusso.com?subject={E(x['t'])}">info<span class="at">@</span>ruggierorusso.com</a><p class="ctas"><a class="btn red" href="{up}{FP.PATHS['quote'][lg]}">{FP.TX[lg]['cta_quote']} →</a></p></section>'''
     other = T['en' if lg == 'it' else 'it']['dir']
     alt = ((f'../en/{other}/{x["s"]}.html', f'en/{other}/{x["s"]}.html') if lg == 'it'
            else (f'../../{other}/{x["s"]}.html', f'{other}/{x["s"]}.html'))
@@ -233,6 +253,19 @@ if IG:
 for i in range(len(P)):
     w(f'lavori/{P[i]["s"]}.html', project('it', i)); w(f'en/works/{P[i]["s"]}.html', project('en', i))
 import privacy_text as PT
+def extra_page(lg, key, body_fn):
+    depth = 0 if lg == 'it' else 1; up = '../' * depth
+    other = 'en' if lg == 'it' else 'it'
+    alt = ((FP.PATHS[key][other], FP.PATHS[key][other]) if lg == 'it' else ('../' + FP.PATHS[key][other], FP.PATHS[key][other]))
+    title = {'quote': FP.TX[lg]['quote_t'], 'book': FP.TX[lg]['book_t'], 'thanks': FP.TX[lg]['thanks_t']}[key]
+    desc = {'quote': FP.TX[lg]['quote_d'], 'book': FP.TX[lg]['book_d'], 'thanks': FP.TX[lg]['thanks_d']}[key]
+    html_ = page(lg, depth, title + ' · Ruggiero Russo', desc, body_fn(lg, up), alt, P[0]['cover'], FP.PATHS[key][lg])
+    if key == 'thanks': html_ = html_.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta name="robots" content="noindex">', 1)
+    return html_
+for _lg in ('it', 'en'):
+    w(FP.PATHS['quote'][_lg], extra_page(_lg, 'quote', FP.quote_body))
+    w(FP.PATHS['book'][_lg], extra_page(_lg, 'book', lambda lg, up: FP.book_body(lg, up, 'line-of-light-01.jpg')))
+    w(FP.PATHS['thanks'][_lg], extra_page(_lg, 'thanks', FP.thanks_body))
 def privacy(lg):
     secs = ''.join(f'<h2>{h}</h2><p>{b}</p>' for h, b in PT.SECTIONS[lg])
     upd = ('Ultimo aggiornamento: ' if lg == 'it' else 'Last updated: ') + PT.UPDATED[lg]
@@ -243,7 +276,7 @@ def privacy(lg):
 w('privacy.html', privacy('it')); w('en/privacy.html', privacy('en'))
 nf = f'<section class="nf"><h1>404</h1><p>{T["it"]["notfound"]} · {T["en"]["notfound"]}</p><a class="ul" href="/index.html">{T["it"]["home"]}</a></section>'
 w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/').replace('href="privacy.html"', 'href="/privacy.html"'))
-urls = [''] + ['en/', 'privacy.html', 'en/privacy.html'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
+urls = [''] + ['en/', 'privacy.html', 'en/privacy.html', 'preventivo.html', 'en/quote.html', 'prenota-studio.html', 'en/book-studio.html'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
 w('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{DOMAIN}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
 w('robots.txt', f'User-agent: *\nAllow: /\nSitemap: {DOMAIN}/sitemap.xml\n')
 w('_redirects', '/portfolio-item/:slug/  /lavori/:slug.html  301\n/portfolio/  /#lavori  301\n/diario.html  /  301\n/en/diary.html  /en/  301\n')

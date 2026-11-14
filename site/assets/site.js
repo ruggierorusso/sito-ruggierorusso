@@ -60,3 +60,73 @@
     });
   }
 })();
+
+// ---- Effetto luce sulle foto della home ----
+(function () {
+  var h = document.querySelector('.hero.torch');
+  if (!h) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var touch = window.matchMedia('(hover: none)').matches;
+  function set(x, y) { h.style.setProperty('--x', x + 'px'); h.style.setProperty('--y', y + 'px'); }
+  var r = h.getBoundingClientRect(); set(r.width / 2, r.height * 0.35);
+  h.classList.add('on');
+  if (!touch) {
+    h.addEventListener('pointermove', function (e) { var b = h.getBoundingClientRect(); set(e.clientX - b.left, e.clientY - b.top); });
+    h.addEventListener('pointerleave', function () { var b = h.getBoundingClientRect(); set(b.width / 2, b.height * 0.35); });
+  } else if (!reduce) {
+    var t0 = performance.now();
+    (function loop(t) {
+      var b = h.getBoundingClientRect(), k = (t - t0) / 4200;
+      set(b.width * (0.5 + 0.38 * Math.sin(k)), b.height * (0.4 + 0.18 * Math.sin(k * 1.7)));
+      requestAnimationFrame(loop);
+    })(t0);
+  }
+})();
+
+// ---- Moduli a passi (preventivo / prenotazione) ----
+(function () {
+  Array.prototype.forEach.call(document.querySelectorAll('form.wizard'), function (f) {
+    var steps = Array.prototype.slice.call(f.querySelectorAll('.step'));
+    var prev = f.querySelector('[data-prev]'), next = f.querySelector('[data-next]'), send = f.querySelector('[data-send]');
+    var bar = f.querySelector('.progress span');
+    var sum = document.querySelector('[data-summary]');
+    var cur = 0;
+    f.classList.add('js');
+    function valid(st) {
+      var els = st.querySelectorAll('input,select,textarea');
+      for (var i = 0; i < els.length; i++) { if (!els[i].checkValidity()) { els[i].reportValidity(); return false; } }
+      return true;
+    }
+    function show(i) {
+      cur = Math.max(0, Math.min(steps.length - 1, i));
+      steps.forEach(function (s, k) { s.hidden = k !== cur; });
+      prev.hidden = cur === 0; next.hidden = cur === steps.length - 1; send.hidden = cur !== steps.length - 1;
+      if (bar) bar.style.width = ((cur + 1) / steps.length * 100) + '%';
+    }
+    function refresh() {
+      Array.prototype.forEach.call(f.querySelectorAll('input[type=range]'), function (r) {
+        var o = r.parentNode.querySelector('output'); if (o) o.textContent = r.value;
+      });
+      if (!sum) return;
+      var rows = [];
+      steps.forEach(function (s) {
+        var vals = [];
+        Array.prototype.forEach.call(s.querySelectorAll('input,select,textarea'), function (el) {
+          if (el.name === 'privacy' || el.name === 'bot-field' || el.name === 'form-name') return;
+          if ((el.type === 'radio' || el.type === 'checkbox') && !el.checked) return;
+          if (el.value && el.value.trim()) vals.push(el.type === 'range' ? el.value + ' ' + ((el.parentNode.querySelector('small') || {}).textContent || '') : el.value.trim().slice(0, 60));
+        });
+        var title = s.querySelector('legend').lastChild.textContent;
+        rows.push('<dt>' + title + '</dt><dd>' + (vals.length ? vals.map(function (v) { return v.replace(/[<>&"]/g, ''); }).join(', ') : sum.getAttribute('data-empty')) + '</dd>');
+      });
+      sum.innerHTML = rows.join('');
+    }
+    prev.addEventListener('click', function () { show(cur - 1); });
+    next.addEventListener('click', function () { if (valid(steps[cur])) { show(cur + 1); f.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+    f.addEventListener('input', refresh); f.addEventListener('change', refresh);
+    f.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && cur < steps.length - 1) { e.preventDefault(); next.click(); }
+    });
+    show(0); refresh();
+  });
+})();
