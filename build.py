@@ -92,7 +92,7 @@ CLIENTS = [
     ('Blauer', 'blauer'), ('Diadora', 'diadora'), ('Umbro', 'umbro'), ('Pyrex', 'pyrex'), ('Camomilla Italia', 'camomilla-italia'),
     ('Dimensione Danza', 'dimensione-danza'), ('Disclaimer', 'disclaimer'), ('Hevò', 'hevo'),
     ('Cycle', 'cycle'),
-    ('4Giveness', '4giveness'), ('PriceTees', 'pricetees'), ('SCISCI', 'scisci'), ('Vitamina Tu', 'vitamina-tu'),
+    ('4Giveness', '4giveness'), ('Prince Tees', 'pricetees'), ('SCISCI', 'scisci'), ('Vitamina Tu', 'vitamina-tu'),
     ('Shop Art', 'shop-art'), ('EUMakers', 'eumakers'),
 ]
 def client_logos(up):
