@@ -281,3 +281,17 @@
   }
   requestAnimationFrame(frame);
 })();
+
+// ---- Slide foto accanto a ERRE studio: cambia ogni 2 secondi ----
+(function () {
+  var box = document.querySelector('[data-slides]'); if (!box) return;
+  var imgs = box.querySelectorAll('img'); if (imgs.length < 2) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  Array.prototype.forEach.call(imgs, function (im) { im.loading = 'eager'; });
+  var i = 0, timer = null;
+  function next() { imgs[i].classList.remove('on'); i = (i + 1) % imgs.length; imgs[i].classList.add('on'); }
+  function start() { if (!timer) timer = setInterval(next, 2000); }
+  function stop() { clearInterval(timer); timer = null; }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { e[0].isIntersecting ? start() : stop(); }).observe(box); else start();
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+})();

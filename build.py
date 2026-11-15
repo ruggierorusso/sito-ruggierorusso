@@ -82,6 +82,9 @@ T = {
    notfound='Page not found', diary='Diary', diary_all='Full diary', diary_p='diary.html', diary_t='A working diary: every post published on Instagram, updated automatically.', follow='Follow on Instagram', home='Back to home', close='Close', dir='works', open_photo='Open photo'),
 }
 STUDIO_URL = 'https://errestudiobarletta.it/'
+# Foto a rotazione (ogni 2 secondi) accanto a ERRE studio in home
+STUDIO_SLIDES = ['line-of-light-01.jpg', 'emanuele-curci-01.jpg', 'timeless-01.jpg', 'laura-biagiotti-2-02.jpg',
+                 'dalila-02.jpg', 'marzia-editorial-01-02.jpg', 'affordable-02.jpg', 'diadora-kids-02.jpg']
 def SL(h):
     return h.replace('ERRE studio', f'<a class="sl" href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE studio</a>')
 
@@ -190,7 +193,7 @@ def home(lg):
 </section>
 {diary}
 <section id="studio" class="studio">
-  <img src="{up}img/line-of-light-01.jpg" alt="ERRE studio" loading="lazy" width="800" height="1200">
+  <div class="slides" data-slides aria-label="ERRE studio">{''.join(f'<img src="{up}img/{f}" alt="ERRE studio" loading="lazy" width="800" height="1000"{" class=\"on\"" if k == 0 else ""}>' for k, f in enumerate(STUDIO_SLIDES))}</div>
   <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></div>
 </section>
 <section id="chi-sono" class="about">
