@@ -61,7 +61,7 @@
   }
 })();
 
-// ---- Home: tre foto in ombra, luce a cerchio sotto il mouse, cambio ogni 5 secondi ----
+// ---- Home: tre foto in ombra, luce a cerchio sotto il mouse, cambio ogni 3 secondi ----
 (function () {
   var h = document.querySelector('.hero.torch');
   if (!h) return;
@@ -83,7 +83,7 @@
     h.addEventListener('pointerleave', function () { h.classList.remove('lit'); });
   }
 
-  // Rotazione dei lavori: ogni 5 secondi cambia un riquadro alla volta
+  // Rotazione dei lavori: ogni 3 secondi cambia un riquadro alla volta
   var pool = []; try { pool = JSON.parse(h.getAttribute('data-pool') || '[]'); } catch (e) {}
   var slots = Array.prototype.slice.call(h.querySelectorAll('a'));
   if (reduce || pool.length <= slots.length) return;
@@ -106,7 +106,7 @@
     };
     pre.src = p.i;
   }
-  function start() { if (!timer) timer = setInterval(swap, 5000); }
+  function start() { if (!timer) timer = setInterval(swap, 3000); }
   function stop() { clearInterval(timer); timer = null; }
   if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { e[0].isIntersecting ? start() : stop(); }).observe(h); else start();
   document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
