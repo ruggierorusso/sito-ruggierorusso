@@ -191,7 +191,7 @@ def home(lg):
 {diary}
 <section id="studio" class="studio">
   <img src="{up}img/line-of-light-01.jpg" alt="ERRE studio" loading="lazy" width="800" height="1200">
-  <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><p class="ctas"><a class="btn" href="{STUDIO_URL}noleggio" target="_blank" rel="noopener">{FP.TX[lg]['cta_book']}</a><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></p></div>
+  <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></div>
 </section>
 <section id="chi-sono" class="about">
   <h2>{t['about']}</h2><p>{t['about_t']}</p>
@@ -201,7 +201,6 @@ def home(lg):
   <p class="label">{t['project']}</p>
   <a class="mail" href="mailto:info@ruggierorusso.com">info<span class="at">@</span>ruggierorusso.com</a>
   <p class="addr">{SL('ERRE studio')} · Via Patalini 11, 76121 Barletta (BT), {'Italia' if lg == 'it' else 'Italy'} · <a href="tel:+393898012408">+39 389 801 2408</a></p>
-  <p class="ctas"><a class="btn" href="{STUDIO_URL}noleggio" target="_blank" rel="noopener">{FP.TX[lg]['cta_book']}</a></p>
 </section>'''
     alt = ('en/index.html', 'en/') if lg == 'it' else ('../index.html', '')
     canon = '' if lg == 'it' else 'en/'
