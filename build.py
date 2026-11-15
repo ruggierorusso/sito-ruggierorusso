@@ -161,7 +161,7 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
 </html>
 '''
 
-FORM_URL = 'FORM_URL_PLACEHOLDER'
+FORM_URL = 'https://script.google.com/macros/s/AKfycbxT6phD_UFaz6rKwhHmcnkTNMTZwkyt3n-q4cvRokuPwm-2gruuFsGlw0JRfPpGbusO/exec'
 def contact_form(lg, up):
     if 'PLACEHOLDER' in FORM_URL: return ''  # form hidden until the Apps Script URL is set
     it = lg == 'it'

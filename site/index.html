@@ -64,7 +64,17 @@
 <section id="contatti" class="contact">
   <p class="label">Hai un progetto?</p>
   <a class="mail" href="mailto:info@ruggierorusso.com">info<span class="at">@</span>ruggierorusso.com</a>
-  
+  <form class="cform" action="https://script.google.com/macros/s/AKfycbxT6phD_UFaz6rKwhHmcnkTNMTZwkyt3n-q4cvRokuPwm-2gruuFsGlw0JRfPpGbusO/exec" method="post" novalidate data-ok="Grazie! Messaggio inviato. Ti rispondo al più presto." data-err="Invio non riuscito. Scrivimi direttamente a info@ruggierorusso.com" data-inv="Controlla i campi evidenziati.">
+    <p class="or">oppure scrivimi qui</p>
+    <fieldset class="tipi"><legend>Di cosa si tratta?</legend><label class="chip"><input type="radio" name="tipo" value="Fashion"><span>Fashion</span></label><label class="chip"><input type="radio" name="tipo" value="Still life"><span>Still life</span></label><label class="chip"><input type="radio" name="tipo" value="Advertising"><span>Advertising</span></label><label class="chip"><input type="radio" name="tipo" value="Ritratto"><span>Ritratto</span></label><label class="chip"><input type="radio" name="tipo" value="Altro"><span>Altro</span></label></fieldset>
+    <div class="row"><label class="f"><span>Nome</span><input name="nome" autocomplete="name" required maxlength="100"></label>
+    <label class="f"><span>Email</span><input name="email" type="email" autocomplete="email" required maxlength="200"></label></div>
+    <label class="f"><span>Messaggio</span><textarea name="messaggio" rows="5" required maxlength="5000"></textarea></label>
+    <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+    <input type="hidden" name="lingua" value="it">
+    <label class="pc"><input type="checkbox" name="privacy" value="si" required><span>Ho letto l'<a href="privacy.html">informativa privacy</a> e acconsento al trattamento dei dati per ricevere una risposta.</span></label>
+    <p class="fbtn"><button type="submit" class="btn red">Invia messaggio</button><span class="fmsg" role="status" aria-live="polite"></span></p>
+  </form>
   <p class="addr"><a class="sl" href="https://errestudiobarletta.it/" target="_blank" rel="noopener">ERRE studio</a> · Via Patalini 11, 76121 Barletta (BT), Italia · <a href="tel:+393898012408">+39 389 801 2408</a></p>
 </section>
 </main>
