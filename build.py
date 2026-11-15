@@ -191,7 +191,7 @@ def home(lg):
 {diary}
 <section id="studio" class="studio">
   <img src="{up}img/line-of-light-01.jpg" alt="ERRE studio" loading="lazy" width="800" height="1200">
-  <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><p class="ctas"><a class="btn" href="{up}{FP.PATHS['book'][lg]}">{FP.TX[lg]['cta_book']}</a><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></p></div>
+  <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><p class="ctas"><a class="btn" href="{STUDIO_URL}noleggio" target="_blank" rel="noopener">{FP.TX[lg]['cta_book']}</a><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></p></div>
 </section>
 <section id="chi-sono" class="about">
   <h2>{t['about']}</h2><p>{t['about_t']}</p>
@@ -201,7 +201,7 @@ def home(lg):
   <p class="label">{t['project']}</p>
   <a class="mail" href="mailto:info@ruggierorusso.com">info<span class="at">@</span>ruggierorusso.com</a>
   <p class="addr">{SL('ERRE studio')} · Via Patalini 11, 76121 Barletta (BT), {'Italia' if lg == 'it' else 'Italy'} · <a href="tel:+393898012408">+39 389 801 2408</a></p>
-  <p class="ctas"><a class="btn" href="{up}{FP.PATHS['book'][lg]}">{FP.TX[lg]['cta_book']}</a></p>
+  <p class="ctas"><a class="btn" href="{STUDIO_URL}noleggio" target="_blank" rel="noopener">{FP.TX[lg]['cta_book']}</a></p>
 </section>'''
     alt = ('en/index.html', 'en/') if lg == 'it' else ('../index.html', '')
     canon = '' if lg == 'it' else 'en/'
@@ -268,9 +268,6 @@ def extra_page(lg, key, body_fn):
     html_ = page(lg, depth, title + ' · Ruggiero Russo', desc, body_fn(lg, up), alt, P[0]['cover'], FP.PATHS[key][lg])
     if key == 'thanks': html_ = html_.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta name="robots" content="noindex">', 1)
     return html_
-for _lg in ('it', 'en'):
-    w(FP.PATHS['book'][_lg], extra_page(_lg, 'book', lambda lg, up: FP.book_body(lg, up, 'line-of-light-01.jpg')))
-    w(FP.PATHS['thanks'][_lg], extra_page(_lg, 'thanks', FP.thanks_body))
 def moodboard(lg):
     depth = 0 if lg == 'it' else 1; up = '../' * depth
     alt = ('en/moodboard.html', 'en/moodboard.html') if lg == 'it' else ('../moodboard.html', 'moodboard.html')
@@ -288,8 +285,18 @@ def privacy(lg):
 w('privacy.html', privacy('it')); w('en/privacy.html', privacy('en'))
 nf = XP.nf_body()
 w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/').replace('href="privacy.html"', 'href="/privacy.html"').replace('href="moodboard.html"', 'href="/moodboard.html"').replace('href="preventivo.html"', 'href="/preventivo.html"').replace('href="index.html', 'href="/index.html').replace('href="en/', 'href="/en/'))
-urls = [''] + ['en/', 'privacy.html', 'en/privacy.html', 'prenota-studio.html', 'en/book-studio.html'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
+urls = [''] + ['en/', 'privacy.html', 'en/privacy.html', ] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
 w('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{DOMAIN}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
 w('robots.txt', f'User-agent: *\nAllow: /\nSitemap: {DOMAIN}/sitemap.xml\n')
-w('_redirects', '/portfolio-item/:slug/  /lavori/:slug.html  301\n/portfolio/  /#lavori  301\n/diario.html  /  301\n/en/diary.html  /en/  301\n/preventivo.html  /  301\n/en/quote.html  /en/  301\n')
+def redirect(path, target):
+    w(path, f'<!doctype html><meta charset="utf-8"><title>Ruggiero Russo</title><meta name="robots" content="noindex"><link rel="canonical" href="{target if target.startswith('http') else DOMAIN + target}"><meta http-equiv="refresh" content="0; url={target}"><script>location.replace("{target}")</script><a href="{target}">ruggierorusso.com</a>')
+for _p, _t in [('diario.html', '/'), ('en/diary.html', '/en/'), ('preventivo.html', '/'), ('en/quote.html', '/en/'),
+               ('grazie.html', '/'), ('en/thanks.html', '/en/'), ('portfolio/index.html', '/#lavori')]:
+    redirect(_p, _t)
+for _p, _t in [('prenota-studio.html', STUDIO_URL + 'noleggio'), ('en/book-studio.html', STUDIO_URL + 'noleggio')]:
+    redirect(_p, _t)
+for x in P:
+    redirect(f'portfolio-item/{x["s"]}/index.html', f'/lavori/{x["s"]}.html')
+w('CNAME', 'ruggierorusso.com\n')
+w('.nojekyll', '')
 print('ok')
