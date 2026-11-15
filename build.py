@@ -94,7 +94,6 @@ CLIENTS = [
     ('Mejem', 'mejem'), ('Mercii', 'mercii'), ('Cycle', 'cycle'),
     ('4Giveness', '4giveness'), ('PriceTees', 'pricetees'), ('SCISCI', 'scisci'), ('Vitamina Tu', 'vitamina-tu'),
     ('Shop Art', 'shop-art'), ('EUMakers', 'eumakers'),
-    ,
 ]
 def client_logos(up):
     out = []
