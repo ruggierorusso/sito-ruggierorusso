@@ -161,6 +161,26 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
 </html>
 '''
 
+FORM_URL = 'FORM_URL_PLACEHOLDER'
+def contact_form(lg, up):
+    if 'PLACEHOLDER' in FORM_URL: return ''  # form hidden until the Apps Script URL is set
+    it = lg == 'it'
+    L = (lambda a, b: a if it else b)
+    tipi = [('Fashion','Fashion'),('Still life','Still life'),('Advertising','Advertising'),('Ritratto','Portrait'),('Altro','Other')]
+    opts = ''.join(f'<label class="chip"><input type="radio" name="tipo" value="{a}"><span>{L(a, b)}</span></label>' for a, b in tipi)
+    pv = f'{up}{"" if it else "en/"}privacy.html'
+    return f'''<form class="cform" action="{FORM_URL}" method="post" novalidate data-ok="{L('Grazie! Messaggio inviato. Ti rispondo al più presto.', 'Thank you! Message sent. I will get back to you soon.')}" data-err="{L('Invio non riuscito. Scrivimi direttamente a info@ruggierorusso.com', 'Sending failed. Please write to info@ruggierorusso.com')}" data-inv="{L('Controlla i campi evidenziati.', 'Please check the highlighted fields.')}">
+    <p class="or">{L('oppure scrivimi qui', 'or write here')}</p>
+    <fieldset class="tipi"><legend>{L('Di cosa si tratta?', 'What is it about?')}</legend>{opts}</fieldset>
+    <div class="row"><label class="f"><span>{L('Nome', 'Name')}</span><input name="nome" autocomplete="name" required maxlength="100"></label>
+    <label class="f"><span>Email</span><input name="email" type="email" autocomplete="email" required maxlength="200"></label></div>
+    <label class="f"><span>{L('Messaggio', 'Message')}</span><textarea name="messaggio" rows="5" required maxlength="5000"></textarea></label>
+    <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+    <input type="hidden" name="lingua" value="{lg}">
+    <label class="pc"><input type="checkbox" name="privacy" value="si" required><span>{L(f'Ho letto l\'<a href="{pv}">informativa privacy</a> e acconsento al trattamento dei dati per ricevere una risposta.', f'I have read the <a href="{pv}">privacy policy</a> and agree to my data being used to reply to me.')}</span></label>
+    <p class="fbtn"><button type="submit" class="btn red">{L('Invia messaggio', 'Send message')}</button><span class="fmsg" role="status" aria-live="polite"></span></p>
+  </form>'''
+
 def home(lg):
     t = T[lg]; up = '' if lg == 'it' else '../'; d = t['dir']
     hero = []
@@ -220,6 +240,7 @@ def home(lg):
 <section id="contatti" class="contact">
   <p class="label">{t['project']}</p>
   <a class="mail" href="mailto:info@ruggierorusso.com">info<span class="at">@</span>ruggierorusso.com</a>
+  {contact_form(lg, up)}
   <p class="addr">{SL('ERRE studio')} · Via Patalini 11, 76121 Barletta (BT), {'Italia' if lg == 'it' else 'Italy'} · <a href="tel:+393898012408">+39 389 801 2408</a></p>
 </section>'''
     alt = ('en/index.html', 'en/') if lg == 'it' else ('../index.html', '')

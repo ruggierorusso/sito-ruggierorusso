@@ -336,3 +336,34 @@
     m.appendChild(f);
   });
 })();
+/* contact form */
+(function(){
+  var f=document.querySelector('.cform'); if(!f) return;
+  var msg=f.querySelector('.fmsg');
+  function bad(el,on){var w=el.closest('.f,.pc'); if(w) w.classList.toggle('bad',on);}
+  f.addEventListener('input',function(e){bad(e.target,false);});
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var ok=true, first=null;
+    ['nome','email','messaggio','privacy'].forEach(function(n){
+      var el=f.elements[n], v=el.type==='checkbox'?el.checked:el.value.trim();
+      var good=!!v && (n!=='email'||/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(el.value.trim()));
+      bad(el,!good); if(!good){ok=false; if(!first) first=el;}
+    });
+    msg.classList.remove('err');
+    if(!ok){msg.textContent=f.dataset.inv; msg.classList.add('err'); first.focus(); return;}
+    var d=new URLSearchParams();
+    Array.prototype.forEach.call(f.elements,function(el){
+      if(!el.name) return;
+      if((el.type==='radio'||el.type==='checkbox')&&!el.checked) return;
+      d.append(el.name,el.value);
+    });
+    f.classList.add('sending'); msg.textContent='…';
+    fetch(f.action,{method:'POST',body:d}).then(function(r){return r.json();}).then(function(j){
+      if(!j.ok) throw 0;
+      f.classList.remove('sending'); f.classList.add('done'); msg.textContent=f.dataset.ok;
+    }).catch(function(){
+      f.classList.remove('sending'); msg.textContent=f.dataset.err; msg.classList.add('err');
+    });
+  });
+})();
