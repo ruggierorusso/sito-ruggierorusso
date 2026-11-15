@@ -90,11 +90,11 @@ def SL(h):
 CLIENTS = [
     ('RED Valentino', 'red-valentino'), ('Laura Biagiotti', 'laura-biagiotti'), ('Jean Paul Gaultier', 'jean-paul-gaultier'),
     ('Blauer', 'blauer'), ('Diadora', 'diadora'), ('Umbro', 'umbro'), ('Pyrex', 'pyrex'), ('Camomilla Italia', 'camomilla-italia'),
-    ('Dimensione Danza', 'dimensione-danza'), ('Perlarouge', 'perlarouge'), ('Disclaimer', 'disclaimer'), ('Hevò', 'hevo'),
-    ('Mejem', 'mejem'), ('Mercii', 'mercii'), ('Cycle', 'cycle'), ('Esmeralda Showroom', 'esmeralda-showroom'),
+    ('Dimensione Danza', 'dimensione-danza'), ('Disclaimer', 'disclaimer'), ('Hevò', 'hevo'),
+    ('Mejem', 'mejem'), ('Mercii', 'mercii'), ('Cycle', 'cycle'),
     ('4Giveness', '4giveness'), ('PriceTees', 'pricetees'), ('SCISCI', 'scisci'), ('Vitamina Tu', 'vitamina-tu'),
-    ('Shop Art', 'shop-art'), ('DaCaBo', 'dacabo'), ('Dieci Terre', 'dieci-terre'), ('EUMakers', 'eumakers'),
-    ('Olio TA', 'olio-ta'), ('MOYA', 'moya'),
+    ('Shop Art', 'shop-art'), ('EUMakers', 'eumakers'),
+    ,
 ]
 def client_logos(up):
     out = []
