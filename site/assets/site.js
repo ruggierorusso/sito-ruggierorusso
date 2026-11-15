@@ -216,6 +216,12 @@
       var l = load(); shared.forEach(function (x) { if (!l.some(function (y) { return y.s === x.s; })) l.push(x); });
       save(l); shared = null; history.replaceState(null, '', location.pathname); render();
     });
+    pg.querySelector('[data-mb-mail]').addEventListener('click', function () {
+      var l = shared || load(), en = document.documentElement.lang === 'en';
+      var body = (en ? 'Hi Ruggiero, here is my moodboard:' : 'Ciao Ruggiero, ecco la mia moodboard:') + '\n\n' +
+        l.map(function (x) { return 'https://ruggierorusso.com/' + x.s; }).join('\n') + '\n\n';
+      location.href = 'mailto:info@ruggierorusso.com?subject=' + encodeURIComponent('Moodboard') + '&body=' + encodeURIComponent(body);
+    });
     pg.querySelector('[data-mb-clear]').addEventListener('click', function () { save([]); render(); });
     render();
   }

@@ -134,7 +134,6 @@ def page(lg, depth, title, desc, body, alt_href, og_img, canon):
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#chi-sono">{t['about']}</a>
     <a href="{up}{'' if lg == 'it' else 'en/'}index.html#contatti">{t['contact']}</a>
     <a class="mb-link" href="{up}{XP.PATH[lg]}" hidden>♡ <span data-mb-n>0</span></a>
-    <a class="cta" href="{up}{FP.PATHS['quote'][lg]}">{FP.TX[lg]['quote']}</a>
     <a class="lang" href="{alt_href[0]}" hreflang="{'en' if lg == 'it' else 'it'}">{t['other']}</a>
   </nav>
 </header>
@@ -203,7 +202,7 @@ def home(lg):
   <p class="label">{t['project']}</p>
   <a class="mail" href="mailto:info@ruggierorusso.com">info<span class="at">@</span>ruggierorusso.com</a>
   <p class="addr">{SL('ERRE studio')} · Via Patalini 11, 76121 Barletta (BT), {'Italia' if lg == 'it' else 'Italy'} · <a href="tel:+393898012408">+39 389 801 2408</a></p>
-  <p class="ctas"><a class="btn red" href="{up}{FP.PATHS['quote'][lg]}">{FP.TX[lg]['cta_quote']} →</a><a class="btn" href="{up}{FP.PATHS['book'][lg]}">{FP.TX[lg]['cta_book']}</a></p>
+  <p class="ctas"><a class="btn" href="{up}{FP.PATHS['book'][lg]}">{FP.TX[lg]['cta_book']}</a></p>
 </section>'''
     alt = ('en/index.html', 'en/') if lg == 'it' else ('../index.html', '')
     canon = '' if lg == 'it' else 'en/'
@@ -227,7 +226,7 @@ def project(lg, i):
   <a href="{prv['s']}.html"><span class="label">← {t['prev']}</span><span class="pt">{E(prv['t'])}</span></a>
   <a class="r" href="{nxt['s']}.html"><span class="label">{t['next']} →</span><span class="pt">{E(nxt['t'])}</span></a>
 </nav>
-<section class="contact small-c"><p class="label">{t['similar']}</p><a class="mail" href="mailto:info@ruggierorusso.com?subject={E(x['t'])}">info<span class="at">@</span>ruggierorusso.com</a><p class="ctas"><a class="btn red" href="{up}{FP.PATHS['quote'][lg]}">{FP.TX[lg]['cta_quote']} →</a></p></section>'''
+<section class="contact small-c"><p class="label">{t['similar']}</p><a class="mail" href="mailto:info@ruggierorusso.com?subject={E(x['t'])}">info<span class="at">@</span>ruggierorusso.com</a></section>'''
     other = T['en' if lg == 'it' else 'it']['dir']
     alt = ((f'../en/{other}/{x["s"]}.html', f'en/{other}/{x["s"]}.html') if lg == 'it'
            else (f'../../{other}/{x["s"]}.html', f'{other}/{x["s"]}.html'))
@@ -271,13 +270,12 @@ def extra_page(lg, key, body_fn):
     if key == 'thanks': html_ = html_.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta name="robots" content="noindex">', 1)
     return html_
 for _lg in ('it', 'en'):
-    w(FP.PATHS['quote'][_lg], extra_page(_lg, 'quote', FP.quote_body))
     w(FP.PATHS['book'][_lg], extra_page(_lg, 'book', lambda lg, up: FP.book_body(lg, up, 'line-of-light-01.jpg')))
     w(FP.PATHS['thanks'][_lg], extra_page(_lg, 'thanks', FP.thanks_body))
 def moodboard(lg):
     depth = 0 if lg == 'it' else 1; up = '../' * depth
     alt = ('en/moodboard.html', 'en/moodboard.html') if lg == 'it' else ('../moodboard.html', 'moodboard.html')
-    body = XP.mb_body(lg, up, up + FP.PATHS['quote'][lg], up + ('' if lg == 'it' else 'en/') + 'index.html#lavori')
+    body = XP.mb_body(lg, up, None, up + ('' if lg == 'it' else 'en/') + 'index.html#lavori')
     h = page(lg, depth, XP.TX[lg]['mb_t'] + ' · Ruggiero Russo', XP.TX[lg]['mb_d'], body, alt, P[0]['cover'], XP.PATH[lg])
     return h.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta name="robots" content="noindex">', 1)
 w(XP.PATH['it'], moodboard('it')); w(XP.PATH['en'], moodboard('en'))
@@ -291,8 +289,8 @@ def privacy(lg):
 w('privacy.html', privacy('it')); w('en/privacy.html', privacy('en'))
 nf = XP.nf_body()
 w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/').replace('href="privacy.html"', 'href="/privacy.html"').replace('href="moodboard.html"', 'href="/moodboard.html"').replace('href="preventivo.html"', 'href="/preventivo.html"').replace('href="index.html', 'href="/index.html').replace('href="en/', 'href="/en/'))
-urls = [''] + ['en/', 'privacy.html', 'en/privacy.html', 'preventivo.html', 'en/quote.html', 'prenota-studio.html', 'en/book-studio.html'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
+urls = [''] + ['en/', 'privacy.html', 'en/privacy.html', 'prenota-studio.html', 'en/book-studio.html'] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
 w('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{DOMAIN}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
 w('robots.txt', f'User-agent: *\nAllow: /\nSitemap: {DOMAIN}/sitemap.xml\n')
-w('_redirects', '/portfolio-item/:slug/  /lavori/:slug.html  301\n/portfolio/  /#lavori  301\n/diario.html  /  301\n/en/diary.html  /en/  301\n')
+w('_redirects', '/portfolio-item/:slug/  /lavori/:slug.html  301\n/portfolio/  /#lavori  301\n/diario.html  /  301\n/en/diary.html  /en/  301\n/preventivo.html  /  301\n/en/quote.html  /en/  301\n')
 print('ok')

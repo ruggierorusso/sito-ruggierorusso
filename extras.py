@@ -2,15 +2,15 @@
 PATH = {'it': 'moodboard.html', 'en': 'en/moodboard.html'}
 TX = {
  'it': dict(mb='Moodboard', save='Aggiungi alla moodboard', saved='Nella moodboard',
-   mb_t='La tua moodboard', mb_d='Le foto che hai salvato dal portfolio. Allegale alla richiesta di preventivo oppure condividi il link con il tuo team.',
+   mb_t='La tua moodboard', mb_d='Le foto che hai salvato dal portfolio. Mandala a Ruggiero via email oppure condividi il link con il tuo team.',
    empty='La moodboard è vuota. Apri un lavoro e tocca ♡ sulle foto che ti ispirano.', go='Sfoglia i lavori',
-   send='Richiedi un preventivo con questa moodboard', share='Copia il link da condividere', copied='Link copiato',
+   send='Invia la moodboard via email', share='Copia il link da condividere', copied='Link copiato',
    clear='Svuota', remove='Rimuovi', shared='Moodboard condivisa con te', keep='Salva nella mia moodboard', attached='foto dalla moodboard allegate',
    lp='Pagina non trovata. Intanto, disegna con la luce: muovi il mouse o il dito.', lp_clear='Ricomincia'),
  'en': dict(mb='Moodboard', save='Add to moodboard', saved='In your moodboard',
-   mb_t='Your moodboard', mb_d='The photos you saved from the portfolio. Attach them to a quote request or share the link with your team.',
+   mb_t='Your moodboard', mb_d='The photos you saved from the portfolio. Email it to Ruggiero or share the link with your team.',
    empty='Your moodboard is empty. Open a project and tap ♡ on the photos that inspire you.', go='Browse the work',
-   send='Request a quote with this moodboard', share='Copy shareable link', copied='Link copied',
+   send='Email this moodboard', share='Copy shareable link', copied='Link copied',
    clear='Clear', remove='Remove', shared='Moodboard shared with you', keep='Save to my moodboard', attached='photos attached from your moodboard',
    lp='Page not found. Meanwhile, paint with light: move your mouse or finger.', lp_clear='Start again'),
 }
@@ -26,7 +26,7 @@ def mb_body(lg, up, quote_href, works_href):
   <div class="mbgrid"></div>
   <p class="mb-empty" hidden>{t['empty']} <a class="ul" href="{works_href}">{t['go']} →</a></p>
   <p class="ctas mb-actions" hidden>
-    <a class="btn red" href="{quote_href}">{t['send']} →</a>
+    <button type="button" class="btn red" data-mb-mail>{t['send']} →</button>
     <button type="button" class="btn" data-mb-share>{t['share']}</button>
     <button type="button" class="btn" data-mb-keep hidden>{t['keep']}</button>
     <button type="button" class="btn ghost" data-mb-clear>{t['clear']}</button>
