@@ -23,9 +23,9 @@ def home(domain, lg, cover):
                        'addressLocality': STUDIO['city'], 'addressRegion': STUDIO['region'], 'addressCountry': 'IT'},
            'areaServed': ['Puglia', 'Basilicata', 'Italia'], 'founder': {'@id': domain + '/#ruggiero'}, 'sameAs': SAME_AS,
            'openingHoursSpecification': [
-               {'@type': 'OpeningHoursSpecification', 'dayOfWeek': DAYS, 'opens': '09:30', 'closes': '13:00'},
-               {'@type': 'OpeningHoursSpecification', 'dayOfWeek': DAYS, 'opens': '16:00', 'closes': '20:00'},
-               {'@type': 'OpeningHoursSpecification', 'dayOfWeek': ['Saturday'], 'opens': '09:30', 'closes': '13:00'}],
+               {'@type': 'OpeningHoursSpecification', 'dayOfWeek': DAYS, 'opens': '09:00', 'closes': '13:15'},
+               {'@type': 'OpeningHoursSpecification', 'dayOfWeek': DAYS, 'opens': '16:30', 'closes': '19:30'},
+               {'@type': 'OpeningHoursSpecification', 'dayOfWeek': ['Saturday'], 'opens': '09:00', 'closes': '13:15'}],
            'hasOfferCatalog': {'@type': 'OfferCatalog', 'name': 'Servizi' if lg == 'it' else 'Services', 'itemListElement': [
                {'@type': 'Offer', 'itemOffered': {'@type': 'Service', 'name': n}} for n in
                (['Fotografia di moda', 'Fotografia still-life e di prodotto', 'Fotografia pubblicitaria', 'Foto per e-commerce', 'Noleggio sala posa ERRE studio']
