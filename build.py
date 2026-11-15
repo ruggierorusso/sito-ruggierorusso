@@ -82,7 +82,8 @@ T = {
    notfound='Page not found', diary='Diary', diary_all='Full diary', diary_p='diary.html', diary_t='A working diary: every post published on Instagram, updated automatically.', follow='Follow on Instagram', home='Back to home', close='Close', dir='works', open_photo='Open photo'),
 }
 STUDIO_URL = 'https://errestudiobarletta.it/'
-# Foto a rotazione (ogni 2 secondi) accanto a ERRE studio in home
+MAP_Q = 'ERRE+studio,+Via+Patalini+11,+76121+Barletta+BT'
+# Foto a rotazione (non più usate in home: ora c'è la mappa)
 STUDIO_SLIDES = ['line-of-light-01.jpg', 'emanuele-curci-01.jpg', 'timeless-01.jpg', 'laura-biagiotti-2-02.jpg',
                  'dalila-02.jpg', 'marzia-editorial-01-02.jpg', 'affordable-02.jpg', 'diadora-kids-02.jpg']
 def SL(h):
@@ -203,7 +204,13 @@ def home(lg):
 </section>
 {diary}
 <section id="studio" class="studio">
-  <div class="slides" data-slides aria-label="ERRE studio">{''.join(f'<img src="{up}img/{f}" alt="ERRE studio" loading="lazy" width="800" height="1000"{" class=\"on\"" if k == 0 else ""}>' for k, f in enumerate(STUDIO_SLIDES))}</div>
+  <div class="map" data-map="https://www.google.com/maps?q={MAP_Q}&z=16&hl={lg}&output=embed">
+    <span class="pin" aria-hidden="true"></span>
+    <p class="maddr">Via Patalini 11<br>76121 Barletta (BT)</p>
+    <p class="mbtns"><button type="button" class="btn" data-map-load>{'Mostra la mappa' if lg == 'it' else 'Show the map'}</button>
+    <a class="ul" href="https://www.google.com/maps/search/?api=1&query={MAP_Q}" target="_blank" rel="noopener">{'Apri in Google Maps' if lg == 'it' else 'Open in Google Maps'} →</a></p>
+    <p class="mnote">{'Caricando la mappa accetti che Google Maps possa usare cookie.' if lg == 'it' else 'Loading the map lets Google Maps use cookies.'}</p>
+  </div>
   <div><h2><a href="{STUDIO_URL}" target="_blank" rel="noopener">ERRE<br>studio</a></h2><p>{t['studio_t']}</p><a class="ul" href="{STUDIO_URL}" target="_blank" rel="noopener">errestudiobarletta.it →</a></div>
 </section>
 <section id="chi-sono" class="about">

@@ -324,3 +324,15 @@
   if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { e[0].isIntersecting ? start() : stop(); }).observe(box); else start();
   document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
 })();
+
+// ---- Mappa di ERRE studio: Google Maps si carica solo quando la chiedi ----
+(function () {
+  var m = document.querySelector('[data-map]'); if (!m) return;
+  var b = m.querySelector('[data-map-load]');
+  b.addEventListener('click', function () {
+    var f = document.createElement('iframe');
+    f.src = m.getAttribute('data-map'); f.loading = 'lazy'; f.title = 'ERRE studio – Google Maps';
+    f.referrerPolicy = 'no-referrer-when-downgrade'; f.allowFullscreen = true;
+    m.appendChild(f);
+  });
+})();
