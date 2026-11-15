@@ -145,12 +145,17 @@ h1,h2{font-weight:400;margin:0;text-transform:uppercase}
 .btn.ghost{border-color:#3A3A3E}
 .ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:28px 0 0}
 
-/* ---- Effetto luce ---- */
-.hero.torch{position:relative;--x:50%;--y:35%}
-.hero.torch::after{content:"";position:absolute;inset:0 24px 34px;pointer-events:none;z-index:1;opacity:0;transition:opacity .6s;
-  background:radial-gradient(circle 300px at var(--x) var(--y),rgba(255,248,235,.10) 0,rgba(0,0,0,0) 38%,rgba(0,0,0,.78) 100%)}
-.hero.torch.on::after{opacity:1}
-.hero.torch .cap{position:relative;z-index:2}
+/* ---- Effetto luce: foto in ombra, cerchio di luce sotto il mouse ---- */
+@property --r{syntax:'<length>';inherits:true;initial-value:0px}
+.hero.torch{--r:0px;transition:--r .45s ease}
+.hero.torch.lit{--r:230px}
+.hero.torch .ph{position:relative;display:block;--x:-999px;--y:-999px}
+.hero.torch.on .ph::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle calc(var(--r) + 1px) at var(--x) var(--y),rgba(0,0,0,0) 0,rgba(0,0,0,0) 55%,rgba(0,0,0,.99) 100%)}
+.hero.torch a img{transition:opacity .6s ease}
+.hero.torch a.fade img{opacity:0}
+.hero.torch .cap{transition:opacity .6s ease,color .15s}
+.hero.torch a.fade .cap{opacity:.2}
 
 /* ---- Moduli ---- */
 .lead{font-family:var(--text);font-size:18px;line-height:1.6;color:var(--soft);max-width:640px;margin:24px 0 0}
@@ -196,7 +201,6 @@ h1,h2{font-weight:400;margin:0;text-transform:uppercase}
 @media (max-width:760px){
   .formwrap{padding:0 16px 32px;gap:32px}
   .summary{position:static;max-width:none}
-  .hero.torch::after{inset:0 16px 34px}
   .top nav .cta{padding:4px 8px}
 }
 

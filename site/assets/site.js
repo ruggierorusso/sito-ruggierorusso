@@ -61,26 +61,55 @@
   }
 })();
 
-// ---- Effetto luce sulle foto della home ----
+// ---- Home: tre foto in ombra, luce a cerchio sotto il mouse, cambio ogni 5 secondi ----
 (function () {
   var h = document.querySelector('.hero.torch');
   if (!h) return;
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var touch = window.matchMedia('(hover: none)').matches;
-  function set(x, y) { h.style.setProperty('--x', x + 'px'); h.style.setProperty('--y', y + 'px'); }
-  var r = h.getBoundingClientRect(); set(r.width / 2, r.height * 0.35);
-  h.classList.add('on');
-  if (!touch) {
-    h.addEventListener('pointermove', function (e) { var b = h.getBoundingClientRect(); set(e.clientX - b.left, e.clientY - b.top); });
-    h.addEventListener('pointerleave', function () { var b = h.getBoundingClientRect(); set(b.width / 2, b.height * 0.35); });
-  } else if (!reduce) {
-    var t0 = performance.now();
-    (function loop(t) {
-      var b = h.getBoundingClientRect(), k = (t - t0) / 4200;
-      set(b.width * (0.5 + 0.38 * Math.sin(k)), b.height * (0.4 + 0.18 * Math.sin(k * 1.7)));
-      requestAnimationFrame(loop);
-    })(t0);
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var touch = matchMedia('(hover: none)').matches;
+  var phs = h.querySelectorAll('.ph');
+  // x, y relativi alla sezione: ogni foto calcola il proprio punto, così il cerchio passa da una foto all'altra
+  function set(x, y) {
+    var hb = h.getBoundingClientRect();
+    Array.prototype.forEach.call(phs, function (ph) {
+      var b = ph.getBoundingClientRect();
+      ph.style.setProperty('--x', (x + hb.left - b.left) + 'px'); ph.style.setProperty('--y', (y + hb.top - b.top) + 'px');
+    });
   }
+  // Ombra e luce solo con il mouse; su telefono le foto restano visibili
+  if (!touch) {
+    h.classList.add('on');
+    h.addEventListener('pointermove', function (e) { var b = h.getBoundingClientRect(); set(e.clientX - b.left, e.clientY - b.top); h.classList.add('lit'); });
+    h.addEventListener('pointerleave', function () { h.classList.remove('lit'); });
+  }
+
+  // Rotazione dei lavori: ogni 5 secondi cambia un riquadro alla volta
+  var pool = []; try { pool = JSON.parse(h.getAttribute('data-pool') || '[]'); } catch (e) {}
+  var slots = Array.prototype.slice.call(h.querySelectorAll('a'));
+  if (reduce || pool.length <= slots.length) return;
+  var shown = slots.map(function (a) { return a.getAttribute('href'); });
+  var turn = 0, timer = null;
+  function pick() {
+    var free = pool.filter(function (p) { return shown.indexOf(p.h) < 0; });
+    return free[Math.floor(Math.random() * free.length)];
+  }
+  function swap() {
+    var k = turn++ % slots.length, a = slots[k], img = a.querySelector('img'), cap = a.querySelector('.cap'), p = pick();
+    if (!p) return;
+    var pre = new Image();
+    pre.onload = function () {
+      a.classList.add('fade');
+      setTimeout(function () {
+        img.src = p.i; img.alt = p.a; cap.textContent = p.t; a.href = p.h; shown[k] = p.h;
+        a.classList.remove('fade');
+      }, 600);
+    };
+    pre.src = p.i;
+  }
+  function start() { if (!timer) timer = setInterval(swap, 5000); }
+  function stop() { clearInterval(timer); timer = null; }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { e[0].isIntersecting ? start() : stop(); }).observe(h); else start();
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
 })();
 
 // ---- Moduli a passi (preventivo / prenotazione) ----

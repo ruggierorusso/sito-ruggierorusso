@@ -165,7 +165,17 @@ def home(lg):
     hero = []
     for s in ('dalila', 'marzia-editorial-02', 'dimensione-danza'):
         x = next(p for p in P if p['s'] == s)
-        hero.append(f'<a href="{d}/{s}.html"><img src="{up}img/{x["cover"]}" alt="{E(x["t"])}" width="800" height="1200"><span class="cap">{E(x["t"])} · {CATS[x["cat"]][0 if lg == "it" else 1]}</span></a>')
+        hero.append(f'<a href="{d}/{s}.html"><span class="ph"><img src="{up}img/{x["cover"]}" alt="{E(x["t"])}" width="800" height="1200"></span><span class="cap">{E(x["t"])} · {CATS[x["cat"]][0 if lg == "it" else 1]}</span></a>')
+    # Lavori che ruotano nei tre riquadri (solo copertine verticali)
+    pool = []
+    for x in P:
+        try:
+            w_, h_ = Image.open(os.path.join(SITE, 'img', x['cover'])).size
+        except Exception:
+            continue
+        if h_ > w_ * 1.15:
+            pool.append({'h': f'{d}/{x["s"]}.html', 'i': f'{up}img/{x["cover"]}', 't': f'{x["t"]} · {CATS[x["cat"]][0 if lg == "it" else 1]}', 'a': x['t']})
+    hero_pool = E(json.dumps(pool, ensure_ascii=False))
     rows = []
     for i, x in enumerate(P, 1):
         rows.append(f'<li data-cat="{x["cat"]}" data-img="{up}img/{x["cover"]}"><a href="{d}/{x["s"]}.html"><span class="n">{i:02d}</span><span class="t">{E(x["t"])}</span><span class="c">{CATS[x["cat"]][0]}</span></a></li>')
@@ -183,7 +193,7 @@ def home(lg):
     <p class="meta"><span>{t['tag']}</span><span class="red">● {t['avail']}</span></p>
   </div>
 </section>
-<section class="hero torch">{''.join(hero)}</section>
+<section class="hero torch" data-pool="{hero_pool}">{''.join(hero)}</section>
 <section id="lavori" class="works">
   <div class="bar"><h2>{t['index']} <span class="count">({len(P)})</span></h2><div class="chips" role="group">{chips}</div></div>
   <div class="split">
