@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /erre/
 Sitemap: https://ruggierorusso.com/sitemap.xml

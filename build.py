@@ -327,7 +327,7 @@ nf = XP.nf_body()
 w('404.html', page('it', 0, '404 · Ruggiero Russo', T['it']['notfound'], nf, ('en/index.html', 'en/'), P[0]['cover'], '404.html').replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/').replace('href="privacy.html"', 'href="/privacy.html"').replace('href="moodboard.html"', 'href="/moodboard.html"').replace('href="preventivo.html"', 'href="/preventivo.html"').replace('href="index.html', 'href="/index.html').replace('href="en/', 'href="/en/'))
 urls = [''] + ['en/', 'privacy.html', 'en/privacy.html', ] + ([T['it']['diary_p'], 'en/' + T['en']['diary_p']] if IG else []) + [f'lavori/{x["s"]}.html' for x in P] + [f'en/works/{x["s"]}.html' for x in P]
 w('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{DOMAIN}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')
-w('robots.txt', f'User-agent: *\nAllow: /\nDisallow: /erre/\nSitemap: {DOMAIN}/sitemap.xml\n')
+w('robots.txt', f'User-agent: *\nAllow: /\nSitemap: {DOMAIN}/sitemap.xml\n')
 def redirect(path, target):
     w(path, f'<!doctype html><meta charset="utf-8"><title>Ruggiero Russo</title><meta name="robots" content="noindex"><link rel="canonical" href="{target if target.startswith('http') else DOMAIN + target}"><meta http-equiv="refresh" content="0; url={target}"><script>location.replace("{target}")</script><a href="{target}">ruggierorusso.com</a>')
 for _p, _t in [('diario.html', '/'), ('en/diary.html', '/en/'), ('preventivo.html', '/'), ('en/quote.html', '/en/'),
